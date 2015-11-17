@@ -1,0 +1,120 @@
+<!doctype html>
+<html>
+<head>
+
+<title>GoEat </title>
+<link rel="stylesheet" href="css/select2.min.css">
+<link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.6/material.deep_orange-red.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<link rel="stylesheet" type="text/css" href="css/GoEat.css">
+</head>
+
+<body>
+	<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>	
+	<script src="http://maps.googleapis.com/maps/api/js"></script>
+	<script src="https://storage.googleapis.com/code.getmdl.io/1.0.6/material.min.js"></script>
+	<script src="js/goEat.js"></script>
+
+	<div class = "header">
+		<img class="logo" src="img/logo.png">
+		<div class="search-wrapper">
+          <div class="search-box"><img class="search-icon" src="img/search_icon.png" width="21"  alt="search icon" />
+            <input id="search" type="text" placeholder="Search for dishes or restaurants" />
+          </div>
+        </div>
+	</div>
+
+		<div id="menu">
+		   <button id="demo-menu-lower-right"
+					class="mdl-button ">
+			  <i ><img class="search-icon" src="img/menu_button.png" width="50px"  alt="search icon" /></i>
+			</button>
+			<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect"
+				for="demo-menu-lower-right">
+			 <li class="mdl-menu__item"> <div class="mostPopular">Most Popular</div></li>
+
+			  <li class="mdl-menu__item"><div class="mostViewed">Most Viewed</div></li>
+
+			  <li class="mdl-menu__item"><div class="nearMe">Near Me</div></li>
+
+		 	  <li class="mdl-menu__item"><div class="categories">Categories</div></li>
+				<section>
+					<div class="category" data-value="Chinese"><li class="mdl-menu__item " >Chinese</li></div>
+					<div class="category" data-value="Italian"><li class="mdl-menu__item ">Italian</li></div>
+				</section>
+			  <div class="searchBy"><li class="mdl-menu__item">Search By</li></div>
+			</ul>
+		</div>
+	</div>
+	<div id="results">
+		<div class="top">
+
+			<div id="chosenCategory"></div>
+
+			<div id="sortBy">
+				<div id="sortByText"> sort by </div>
+			   <button id="demo-menu-lower-left"
+						class="mdl-button ">
+				  <i ><img class="search-icon" src="img/menu_button.png" width="50px"  alt="search icon" /></i>
+				</button>
+				<ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect"
+					for="demo-menu-lower-left">
+				  <div class="sortByName"><li class="mdl-menu__item">Name</li></div>
+
+				  <div class="sortByPrice"><li class="mdl-menu__item">Price</li></div>
+
+				  <div class="sortByRating"><li class="mdl-menu__item">Rating</li></div>
+
+			 	  <div class="sortByPopularity"><li class="mdl-menu__item">Popularity</li></div>		
+
+			 	  <div class="sortByProximity"><li class="mdl-menu__item">Proximity</li></div>		
+				</ul>
+			</div>		
+		</div>
+
+		<div class="restaurants">
+			<div class="restaurant">
+				<img class ="restaurantImage" src="img/restaurant1.png">
+				<div class ="restaurantDescription">
+					<div class="restaurantTitle">Cathay Cuisine Restaurant</div>
+					<div class="rating"><span>&#9734</span><span>&#9734</span><span>&#9734</span><span>&#9734</span><span>&#9734</span></div>
+					<div class ="restaurantCategory"></div>
+				</div> 
+			</div>
+			<div class="restaurant">
+				<img class ="restaurantImage" src="img/restaurant2.png">
+				<div class ="restaurantDescription">
+					<div class="restaurantTitle">Super Chef</div>
+					<div class="rating"><span>&#9734</span><span>&#9734</span><span>&#9734</span><span>&#9734</span><span>&#9734</span></div>
+					<div class ="restaurantCategory"></div>
+				</div> 
+			</div>
+			<div class="restaurant">
+				<img class ="restaurantImage" src="img/restaurant3.png">
+				<div class ="restaurantDescription">
+					<div class="restaurantTitle">Golden Phoenix</div>
+					<div class="rating"><span>&#9734</span><span>&#9734</span><span>&#9734</span><span>&#9734</span><span>&#9734</span></div>
+					<div class ="restaurantCategory"></div>
+				</div> 
+			</div>
+		</div>
+
+	</div>
+	<div id="googleMap"></div>
+
+	<script>
+		$('section').hide();
+		$('#results').hide();
+ 		$('.categories').click(function(event) {
+			$("section").toggle();
+			setTimeout(function(){$("#demo-menu-lower-right").click();},300);
+
+		});
+ 		$(".category").click(function(event){
+ 			$("#results").show();
+ 			$("#chosenCategory").text($(this).data("value"));
+ 			$(".restaurantCategory").text($(this).data("value"));
+ 		});
+	</script>
+</body>
+</html>
