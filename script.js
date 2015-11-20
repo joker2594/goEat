@@ -95,6 +95,7 @@ function addResult(place) {
 
 function searchQuery(query) {
   //clearMarkers();
+
   initMap();
   places = [];
   $('.result').each(function () {
@@ -104,9 +105,8 @@ function searchQuery(query) {
 
   var request = {
     location: glasgow,
-    radius: '2000',
-    query: query,
-    types: 'restaurant'
+    radius: '5000',
+    query: query + 'restaurant'
   }
   service.textSearch(request, callback);
 }
@@ -158,6 +158,20 @@ $(document).ready(function() {
   var filtertoggle = true;
   var cuisinetoggle = false;
   var searchtoggle = false;
+
+  $(window).load(function() {
+    var query = location.search.split('query=')[1];
+    if (searches.length >= 5) {
+      searches.splice(0, 1);
+    }
+    $('#search').val(query);
+    if (query != undefined) searches.push(query);
+    var json_str = JSON.stringify(searches);
+    createCookie('mycookie', json_str);
+    updateRecentSearches();
+    if (query == undefined) searchQuery('restaurant');
+    else searchQuery(query);
+  });
 
   $(window).load(function() {
     for (i = 0; i < cuisines.length; i++) {
@@ -225,8 +239,9 @@ $(document).ready(function() {
 
   $(document).on('click', '.filter-cuisine', function () {
   var query = $(this).data('cuisineitem');
-  $('#search').val(query);
-  searchQuery(query);
+  //$('#search').val(query);
+  //searchQuery(query);
+  window.location.replace('results.html?query=' + query);
 });
 
   $(document).on('click', '.filter-search', function () {
@@ -237,18 +252,18 @@ $(document).ready(function() {
 
   $('#search').bind("enterKey",function(e){
     var query = $(this).val();
-    //searches.unshift(query);
-    if (searches.length >= 5) {
-      searches.splice(0, 1);
-    }
-    searches.push(query);
-    searchQuery(query);
-    $('.filter-search').each(function () {
-      $(this).remove();
-    });
-    var json_str = JSON.stringify(searches);
-    createCookie('mycookie', json_str);
-    updateRecentSearches();
+    window.location.replace('results.html?query=' + query);
+    // if (searches.length >= 5) {
+    //   searches.splice(0, 1);
+    // }
+    //searches.push(query);
+    // searchQuery(query);
+    // $('.filter-search').each(function () {
+    //   $(this).remove();
+    // });
+    // var json_str = JSON.stringify(searches);
+    // createCookie('mycookie', json_str);
+    // updateRecentSearches();
   });
 
   $('#search').keyup(function(e){
