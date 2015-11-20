@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <link rel="stylesheet" href="style.css"/>
+      <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+      <title>goEat</title>
+  </head>
+  <body>
+    <script src="jquery.js"></script>
+    <script src="script.js"></script>
+    <script async defer
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBFSaTpf802VTdXvM19FJpnp_5IvPt2kuo&callback=initMap">
+    </script>
+    <div id="wrapper">
+      <div id="header">
+        <div id="sidebaricon"></div>
+        <div id="logo">goEat</div>
+        <div id="searchbox"><input id="search" type="text" placeholder="Search for dishes or restaurants..." /></div>
+      </div>
+      <div id="sidebar"><div style="height: 3em;"></div>
+        <div class="category">Filter</div>
+        <div class="filter">Most popular</div>
+        <div class="filter">Top rated</div>
+        <div class="filter">Near you</div>
+        <div class="category">Cuisine</div><div id="cats"></div>
+        <div class="category">Recent Searches</div><div id="searchhistory"></div>
+      </div>
+      <div id="mapwrapper"><div id="map"></div></div>
+    </div>
+  </body>
+</html>
