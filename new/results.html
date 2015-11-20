@@ -9,16 +9,19 @@
   <body>
     <script src="jquery.js"></script>
     <script src="script.js"></script>
-    <script src="goEat.js"></script>
     <script async defer
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBFSaTpf802VTdXvM19FJpnp_5IvPt2kuo&libraries=places&callback=initMap">
     </script>
     <div id="wrapper">
+
+      <!-- HEADER  -->
       <div id="header">
         <div id="sidebaricon"></div>
         <div onclick="location.href='index.html'" id="logo">goEat</div>
         <div id="searchbox"><input id="search" type="text" placeholder="Search for dishes or restaurants..." /></div>
       </div>
+
+      <!-- SIDEBAR -->
       <div id="sidebar"><div style="height: 3em;"></div>
         <div class="category">Filter<img id="filtertoggle" class="catshrink" src='images/shrink.png'/></div>
         <div id="filters">
@@ -29,63 +32,21 @@
         <div class="category">Cuisine<img id="cuisinetoggle" class="catexpand" src='images/expand.png'/></div><div id="cats"></div>
         <div class="category">Recent Searches<img id="searchtoggle" class="catexpand" src='images/expand.png'/></div><div id="searchhistory"></div>
       </div>
+
+      <!-- MAP -->
       <div class="genwrapper"><div style="width:65%" id="map"></div></div>
+
+      <!-- RESULTS -->
       <div id="results">
         <div style="height: 3em;"></div>
         <div class="genwrapper">
-          <div id="resultsheader">Results for: query<div id="sortbox">sort by <img id="sort" src='images/expand.png'/></div></div>
+          <div id="resultsheader"><span id="results-for">All restaurants</span><div id="sortbox">sort by <img id="sort" src='images/expand.png'/></div></div>
         </div>
         <div style="height: 3em;"></div>
-        <div class="result">
-          <img class="restaurant-image" src="images/restaurant.jpg"/>
-          <span class="title">Chop Chop Haymarket</span><div class="rating">★★★★★</div>
-          <div class="details">
-            Chinese - Chinese dining with dumpling specials<br/>Morrison Street<br/>Open until 22:00
-          </div>
-        </div>
-        <div class="result">
-          <img class="restaurant-image" src="images/restaurant.jpg"/>
-          <span class="title">Chop Chop Haymarket</span><div class="rating">★★★★★</div>
-          <div class="details">
-            Chinese - Chinese dining with dumpling specials<br/>Morrison Street<br/>Open until 22:00
-          </div>
-        </div>
-        <div class="result">
-          <img class="restaurant-image" src="images/restaurant.jpg"/>
-          <span class="title">Chop Chop Haymarket</span><div class="rating">★★★★★</div>
-          <div class="details">
-            Chinese - Chinese dining with dumpling specials<br/>Morrison Street<br/>Open until 22:00
-          </div>
-        </div>
-        <div class="result">
-          <img class="restaurant-image" src="images/restaurant.jpg"/>
-          <span class="title">Chop Chop Haymarket</span><div class="rating">★★★★★</div>
-          <div class="details">
-            Chinese - Chinese dining with dumpling specials<br/>Morrison Street<br/>Open until 22:00
-          </div>
-        </div>
-        <div class="result">
-          <img class="restaurant-image" src="images/restaurant.jpg"/>
-          <span class="title">Chop Chop Haymarket</span><div class="rating">★★★★★</div>
-          <div class="details">
-            Chinese - Chinese dining with dumpling specials<br/>Morrison Street<br/>Open until 22:00
-          </div>
-        </div>
-        <div class="result">
-          <img class="restaurant-image" src="images/restaurant.jpg"/>
-          <span class="title">Chop Chop Haymarket</span><div class="rating">★★★★★</div>
-          <div class="details">
-            Chinese - Chinese dining with dumpling specials<br/>Morrison Street<br/>Open until 22:00
-          </div>
-        </div>
-        <div class="result">
-          <img class="restaurant-image" src="images/restaurant.jpg"/>
-          <span class="title">Chop Chop Haymarket</span><div class="rating">★★★★★</div>
-          <div class="details">
-            Chinese - Chinese dining with dumpling specials<br/>Morrison Street<br/>Open until 22:00
-          </div>
-        </div>
-      </div>
-    </div>
+        
+      </div> <!-- end results -->
+
+
+    </div> <!-- end wrapper -->
   </body>
 </html>
