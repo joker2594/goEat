@@ -5,7 +5,6 @@ var infoWindow;
 
 //var markers = [];
 var places = [];
-var searches = [];
 
 function initMap() {
   glasgow = new google.maps.LatLng(55.863791, -4.251667);
@@ -58,7 +57,7 @@ function addMarker(place) {
     }
     infoWindow.setContent(
       "<a href='restaurant.html&id=" + result.id + "' style='color:#008080;text-decoration:none;font-size:1.5em;font-weight:bold;'>" + result.name +
-      "</a><br/><a class='markerlink' href='restaurant.html&id=" + result.id + "'>Visit page</a> | " +
+      "</a><br/><a class='markerlink' href='restaurant.html?id=" + result.id + "'>Visit page</a> | " +
       "<a class='markerlink' href='" + result.website + "'>Visit website</a><br/>" + result.formatted_address
     );
     infoWindow.open(map, marker);
@@ -112,7 +111,37 @@ function searchQuery(query) {
   service.textSearch(request, callback);
 }
 
+var createCookie = function(name, value, days) {
+    var expires;
+    if (days) {
+        var date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        expires = "; expires=" + date.toGMTString();
+    }
+    else {
+        expires = "";
+    }
+    document.cookie = name + "=" + value + expires + "; path=/";
+}
+
+function getCookie(c_name) {
+    if (document.cookie.length > 0) {
+        c_start = document.cookie.indexOf(c_name + "=");
+        if (c_start != -1) {
+            c_start = c_start + c_name.length + 1;
+            c_end = document.cookie.indexOf(";", c_start);
+            if (c_end == -1) {
+                c_end = document.cookie.length;
+            }
+            return unescape(document.cookie.substring(c_start, c_end));
+        }
+    }
+    return "";
+}
+
 function updateRecentSearches() {
+  var json_str = getCookie('mycookie');
+  var searches = JSON.parse(json_str);
   var bound = searches.length > 5 ? 5 : searches.length;
   for (i = 0; i < bound; i++) {
     $('#searchhistory').append("<div class=\'filter filter-search\' searchitem>" + searches[i] + "</div> ");
@@ -122,7 +151,7 @@ function updateRecentSearches() {
 $(document).ready(function() {
   var sidebar = false;
   var cuisines = ['Chinese', 'Japanese', 'Italian', 'Greek', 'American', 'Indian', 'African'];
-  var searches = ['McDonalds', 'Chinese near West End', 'City centre'];
+  var searches = [];
 
   var sortTypes = ['Name','Price','Rating','Popularity','Proximity'];
 
@@ -208,11 +237,17 @@ $(document).ready(function() {
 
   $('#search').bind("enterKey",function(e){
     var query = $(this).val();
-    searches.unshift(query);
+    //searches.unshift(query);
+    if (searches.length >= 5) {
+      searches.splice(0, 1);
+    }
+    searches.push(query);
     searchQuery(query);
     $('.filter-search').each(function () {
       $(this).remove();
     });
+    var json_str = JSON.stringify(searches);
+    createCookie('mycookie', json_str);
     updateRecentSearches();
   });
 
