@@ -3,7 +3,7 @@ var service;
 var glasgow;
 var infoWindow;
 
-var markers = [];
+//var markers = [];
 var places = [];
 var searches = [];
 
@@ -14,15 +14,17 @@ function initMap() {
     zoom: 14
   });
 
+  infoWindow = new google.maps.InfoWindow();
+  service = new google.maps.places.PlacesService(map);
+}
+
+function indexLoad() {
   var request = {
     location: glasgow,
     radius: '5000',
     keyword: 'restaurant',
     maxPriceLevel: 2
   };
-
-  infoWindow = new google.maps.InfoWindow();
-  service = new google.maps.places.PlacesService(map);
   service.radarSearch(request, callback);
 }
 
@@ -60,7 +62,7 @@ function addMarker(place) {
       "<a class='markerlink' href='" + result.website + "'>Visit website</a><br/>" + result.formatted_address
     );
     infoWindow.open(map, marker);
-    markers.push(marker);
+    //markers.push(marker);
     });
   });
 }
@@ -86,14 +88,15 @@ function addResult(place) {
   $('#results').append(result);
 }
 
-function clearMarkers() {
-  for (var i = 0; i < markers.length; i++) {
-    markers[i].setMap(null);
-  }
-}
+// function clearMarkers() {
+//   for (var i = 0; i < markers.length; i++) {
+//     markers[i].setMap(null);
+//   }
+// }
 
 function searchQuery(query) {
-  clearMarkers();
+  //clearMarkers();
+  initMap();
   places = [];
   $('.result').each(function () {
     $(this).remove();
@@ -103,7 +106,8 @@ function searchQuery(query) {
   var request = {
     location: glasgow,
     radius: '2000',
-    query: query
+    query: query,
+    types: 'restaurant'
   }
   service.textSearch(request, callback);
 }
