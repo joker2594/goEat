@@ -2,6 +2,9 @@ $(document).ready(function() {
   var sidebar = false;
   var cuisines = ['Chinese', 'Japanese', 'Italian', 'Greek', 'American', 'Indian', 'African'];
   var searches = ['McDonalds', 'Chinese near West End', 'City centre'];
+  var filtertoggle = true;
+  var cuisinetoggle = false;
+  var searchtoggle = false;
 
   $(window).load(function() {
     for (i = 0; i < cuisines.length; i++) {
@@ -33,14 +36,30 @@ $(document).ready(function() {
   });
 
   $('#sidebaricon').click(function() {
-    if (sidebar) {
-      $('#sidebar').css("display", "none");
-      sidebar = false;
-    }
-    else {
-      $('#sidebar').css("display", "table");
-      sidebar = true;
-    }
+    if (sidebar) $('#sidebar').css("display", "none");
+    else $('#sidebar').css("display", "table");
+    sidebar = !sidebar;
+  });
+
+  $('#filtertoggle').click(function() {
+    if (filtertoggle) $(this).attr("src", "images/expand.png");
+    else $(this).attr("src", "images/shrink.png");
+    filtertoggle = !filtertoggle;
+    $('#filters').toggle();
+  });
+
+  $('#cuisinetoggle').click(function() {
+    if (cuisinetoggle) $(this).attr("src", "images/expand.png");
+    else $(this).attr("src", "images/shrink.png");
+    cuisinetoggle = !cuisinetoggle;
+    $('#cats').toggle();
+  });
+
+  $('#searchtoggle').click(function() {
+    if (searchtoggle) $(this).attr("src", "images/expand.png");
+    else $(this).attr("src", "images/shrink.png");
+    searchtoggle = !searchtoggle;
+    $('#searchhistory').toggle();
   });
 });
 

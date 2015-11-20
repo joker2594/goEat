@@ -12,6 +12,7 @@ body {
 }
 
 #header {
+	min-width: 540px;
   width: 100%;
   height: 3em;
   background-color: #EE7600;
@@ -55,7 +56,7 @@ body {
 
 #sidebar {
 	overflow: scroll;
-	height: 100%;
+	height: inherit;
 	position: relative;
 	display: none;
 	width: 17em;
@@ -64,11 +65,17 @@ body {
 	z-index: 1;
 }
 
+#filters {
+	width: inherit;
+}
+
 #cats {
+	display: none;
 	width: inherit;
 }
 
 #searchhistory {
+	display: none;
 	width: inherit;
 }
 
@@ -80,6 +87,11 @@ body {
 	float: left;
 	color: white;
 	background-color: #198c8c;
+}
+
+.catexpand, .catshrink {
+	cursor: pointer;
+	float: right;
 }
 
 .filter {
