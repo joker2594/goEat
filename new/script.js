@@ -97,14 +97,10 @@ function addMarker(place) {
 
 $(document).ready(function() {
   var sidebar = false;
-<<<<<<< HEAD
   var cuisines = ['Chinese', 'Japanese', 'Italian', 'Greek', 'American', 'Indian'];
-  //var searches = ['McDonalds', 'Chinese near West End', 'City centre'];
-=======
   var cuisines = ['Chinese', 'Japanese', 'Italian', 'Greek', 'American', 'Indian', 'African'];
   var searches = ['McDonalds', 'Chinese near West End', 'City centre'];
   var sortTypes = ['Name','Price','Rating','Popularity','Proximity']
->>>>>>> 8ef2dab130e164369b8fa8ed6e350030b51a1e00
   var filtertoggle = true;
   var cuisinetoggle = false;
   var searchtoggle = false;
