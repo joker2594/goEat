@@ -97,8 +97,14 @@ function addMarker(place) {
 
 $(document).ready(function() {
   var sidebar = false;
+<<<<<<< HEAD
   var cuisines = ['Chinese', 'Japanese', 'Italian', 'Greek', 'American', 'Indian'];
   //var searches = ['McDonalds', 'Chinese near West End', 'City centre'];
+=======
+  var cuisines = ['Chinese', 'Japanese', 'Italian', 'Greek', 'American', 'Indian', 'African'];
+  var searches = ['McDonalds', 'Chinese near West End', 'City centre'];
+  var sortTypes = ['Name','Price','Rating','Popularity','Proximity']
+>>>>>>> 8ef2dab130e164369b8fa8ed6e350030b51a1e00
   var filtertoggle = true;
   var cuisinetoggle = false;
   var searchtoggle = false;
@@ -113,6 +119,9 @@ $(document).ready(function() {
   $(window).load(function() {
     for (i = 0; i < cuisines.length; i++) {
       $('#cats').append('<div class="filter filter-cuisine" data-cuisineitem="' + cuisines[i] + '">' + cuisines[i] + '</div>');
+    }
+    for (i = 0; i < sortTypes.length; i++){
+      $('#sort').append("<div class=\'sortFilter\'sortType>"+sortTypes[i]+"</div>");
     }
   });
 
@@ -135,6 +144,15 @@ $(document).ready(function() {
   });
 
   $(document).on("mouseout", ".filter", function() {
+    $(this).css("background-color", "#ffffff");
+    $(this).css("color", "#000000");
+  });
+    $(document).on("mouseenter", ".sortFilter", function() {
+    $(this).css("background-color", "#f19132");
+    $(this).css("color", "#ffffff");
+  });
+
+  $(document).on("mouseout", ".sortFilter", function() {
     $(this).css("background-color", "#ffffff");
     $(this).css("color", "#000000");
   });
@@ -165,6 +183,13 @@ $(document).ready(function() {
     else $(this).attr("src", "images/shrink.png");
     cuisinetoggle = !cuisinetoggle;
     $('#cats').toggle();
+  });
+
+ $('#sorttoggle').click(function() {
+    if (sorttoggle) $(this).attr("src", "images/expand.png");
+    else $(this).attr("src", "images/shrink.png");
+    sorttoggle = !sorttoggle;
+    $('#sort').toggle();
   });
 
   $('#searchtoggle').click(function() {

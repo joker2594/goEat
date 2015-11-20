@@ -74,6 +74,10 @@ body {
 	display: none;
 	width: inherit;
 }
+#sort{
+	display: none;
+	width: inherit;
+}
 
 #searchhistory {
 	display: none;
@@ -97,7 +101,6 @@ body {
 
 .filter {
 	padding: 1em;
-	display: table-cell;
 	vertical-align: middle;
 	width: inherit;
 	float: left;
@@ -106,7 +109,17 @@ body {
 	cursor: pointer;
 	border-bottom: 1px solid #008080;
 }
-
+.sortFilter{
+	padding: 1em;
+	vertical-align: middle;
+	width:auto;
+	margin-left: 85%;
+	background-color: #ffffff;
+	color: black;
+	cursor: pointer;
+	border-bottom: 1px solid #008080;
+}
+}
 #map {
   height: 100%;
   width: 100%;
@@ -135,6 +148,7 @@ body {
 	color: white;
 	background-color: #198c8c;
 	z-index: 1;
+	height:30px;
 }
 
 #sortbox {
