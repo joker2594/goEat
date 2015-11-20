@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <link rel="stylesheet" href="style.css"/>
+      <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+      <link rel="icon" type="image/png" href="images/icon.png"/>
+      <title>goEat</title>
+  </head>
+  <body>
+    <script src="jquery.js"></script>
+    <script src="script.js"></script>
+    <script async defer
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBFSaTpf802VTdXvM19FJpnp_5IvPt2kuo&callback=initMap&libraries=places">
+    </script>
+    <div id="wrapper">
+      <div id="header">
+        <div id="sidebaricon"></div>
+        <div onclick="location.href='index.html'" id="logo">goEat</div>
+        <div id="searchbox"><input id="search" type="text" placeholder="Search for dishes or restaurants..." /></div>
+      </div>
+      <div id="sidebar"><div style="height: 3em;"></div>
+        <div class="category">Filter<img id="filtertoggle" class="catshrink" src='images/shrink.png'/></div>
+        <div id="filters">
+          <div class="filter">Most popular</div>
+          <div class="filter">Top rated</div>
+          <div class="filter">Near you</div>
+        </div>
+        <div class="category">Cuisine<img id="cuisinetoggle" class="catexpand" src='images/expand.png'/></div><div id="cats"></div>
+        <div class="category">Recent Searches<img id="searchtoggle" class="catexpand" src='images/expand.png'/></div><div id="searchhistory"></div>
+      </div>
+      <div class="genwrapper"><div style="width:65%" id="map"></div></div>
+      <div id="results">
+        <div style="height: 3em;"></div>
+        <div class="genwrapper">
+          <div id="resultsheader"><span id="results-for">Results for: </span><div id="sortbox">sort by <img id="sort" src='images/expand.png'/></div></div>
+        </div>
+        <div style="height: 3.1em;"></div>
+
+      </div>
+    </div>
+  </body>
+</html>
