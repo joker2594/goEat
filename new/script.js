@@ -35,6 +35,14 @@ $(document).ready(function() {
     $(this).css("color", "#000000");
   });
 
+  $(document).on("mouseenter", ".result", function() {
+    $(this).css("background-color", "#f19132");
+  });
+
+  $(document).on("mouseout", ".result", function() {
+    $(this).css("background-color", "#ffffff");
+  });
+
   $('#sidebaricon').click(function() {
     if (sidebar) $('#sidebar').css("display", "none");
     else $('#sidebar').css("display", "table");
@@ -66,7 +74,7 @@ $(document).ready(function() {
 var map;
 function initMap() {
   map = new google.maps.Map(document.getElementById('map'), {
-    center: {lat: 55.86515, lng: -4.25763},
+    center: {lat: 55.863791, lng: -4.251667},
     zoom: 14
   });
 }
