@@ -1,29 +1,50 @@
 
-var myCenter=new google.maps.LatLng(55.8651500,-4.2576300);
+var map;
+var service;
 
-function initialize()
-{
-var mapProp = {
-  center:myCenter,
-  zoom:10,
-  mapTypeControl: false,
-  mapTypeId:google.maps.MapTypeId.ROADMAP
+function initMap() {
+  var glasgow = new google.maps.LatLng(55.8555367,-4.3024978);
+    
+  map = new google.maps.Map(document.getElementById('googleMap'), {
+    
+    center: glasgow,
+    zoom: 14
+  });
+    
+  var request = {
+    location: glasgow,
+    radius: '500',
+    query: 'restaurant'
   };
 
-var map=new google.maps.Map(document.getElementById("googleMap"),mapProp);
-
-var marker=new google.maps.Marker({
-  position:myCenter,
-  });
-
-marker.setMap(map);
+  service = new google.maps.places.PlacesService(map);
+  service.textSearch(request, callback);
 }
 
-google.maps.event.addDomListener(window, 'load', initialize);
+function callback(results, status) {
+  if (status == google.maps.places.PlacesServiceStatus.OK) {
+    for (var i = 0; i < results.length; i++) {
+      var place = results[i];
+      addMarker(results[i]);
+    }
+  }
+}
+
+function addMarker(place) {
+  var marker = new google.maps.Marker({
+    map: map,
+    position: place.geometry.location,
+    icon: {
+      url: 'http://maps.gstatic.com/mapfiles/circle.png',
+      anchor: new google.maps.Point(10, 10),
+      scaledSize: new google.maps.Size(10, 17)
+    }
+  });
+}
  
- function showMenu(){
-   document.getElementById("menuOptions").style.display="block";
- }
- function hideMenu(){
-   document.getElementById("menuOptions").style.display="none";
- }
+function showMenu(){
+    document.getElementById("menuOptions").style.display="block";
+}
+function hideMenu(){
+	document.getElementById("menuOptions").style.display="none";
+}
