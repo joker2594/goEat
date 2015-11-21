@@ -131,11 +131,12 @@ body {
 }
 
 #resultsheader {
+	cursor: default;
 	width: auto;
 	padding: 1em;
 	color: white;
 	background-color: #198c8c;
-	z-index: 1;
+	z-index: -1;
 }
 
 #sortbox {
@@ -145,17 +146,17 @@ body {
 }
 
 .result {
-	cursor: pointer;
 	position: block;
 	padding: 7px;
 	width: auto;
 	border-bottom: solid #008080 1px;
-	background-color: white;
+	z-index: -1;
 }
 
 .title {
-	color: black;
-	font-size: 1.5em;
+	color: #007373;
+	font-size: 1.4em;
+	font-weight: bold;
 }
 
 .rating {
@@ -167,6 +168,7 @@ body {
 
 .details {
 	padding: 5px;
+	padding-top: 2px;
 	color: #595959;
 }
 

@@ -1,15 +1,15 @@
 var map;
 var service;
-var glasgow;
+var clocation;
 var infoWindow;
 
 //var markers = [];
 var places = [];
 
 function initMap() {
-  glasgow = new google.maps.LatLng(55.863791, -4.251667);
+  clocation = new google.maps.LatLng(55.863791, -4.251667);
   map = new google.maps.Map(document.getElementById('map'), {
-    center: glasgow,
+    center: clocation,
     zoom: 14
   });
 
@@ -19,7 +19,7 @@ function initMap() {
 
 function indexLoad() {
   var request = {
-    location: glasgow,
+    location: clocation,
     radius: '5000',
     keyword: 'restaurant',
     maxPriceLevel: 2
@@ -75,7 +75,7 @@ function addResult(place) {
     result += '<img class="restaurant-image" src="' + place.photos[0].getUrl({'maxWidth': 100, 'maxHeight': 100}) + '"/>';
   else
     result += '<img class="restaurant-image" src="images/restaurant.jpg"/>';
-  result += '<span class="title">' + place.name + '</span><div class="rating">'+createRating(place.rating)+'</div>';
+  result += '<span class="title">' + place.name + '</span><div class="rating">'+ getRating(place.rating) +'</div>';
   result += '<div class="details">';
   result += 'Chinese - Chinese dining with dumpling specials<br/>' + place.formatted_address + '<br/>';
   if (openNow)
@@ -87,13 +87,12 @@ function addResult(place) {
   $('#results').append(result);
 }
 
-
-function createRating(rating) {
-  // round rating 
+function getRating(rating) {
+  // round rating
   var rate = Math.round(rating);
   var stars = "";
-  for (var i = 0; i<rate; i++) stars +="★";
-  for (var i = rate; i<5; i++) stars +="☆";
+  for (var i = 0; i < rate; i++) stars += "★";
+  for (var i = rate; i < 5; i++) stars += "☆";
   return stars;
 }
 
@@ -105,8 +104,6 @@ function createRating(rating) {
 
 function searchQuery(query) {
   //clearMarkers();
-
-  initMap();
   places = [];
   $('.result').each(function () {
     $(this).remove();
@@ -114,9 +111,9 @@ function searchQuery(query) {
   $('#results-for').text("Results for " + query);
 
   var request = {
-    location: glasgow,
+    location: clocation,
     radius: '5000',
-    query: query + 'restaurant'
+    query: query + ' restaurant'
   }
   service.textSearch(request, callback);
 }
@@ -149,12 +146,70 @@ function getCookie(c_name) {
     return "";
 }
 
+function nearYou() {
+  map = new google.maps.Map(document.getElementById('map'), {
+    center: clocation,
+    zoom: 14,
+  });
+  infoWindow = new google.maps.InfoWindow({map: map});
+
+  // Try HTML5 geolocation.
+  console.log("near you");
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+      var pos = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+      };
+
+      infoWindow.setPosition(pos);
+      infoWindow.setContent("<span style='font-weight:bold;color:#EE7600;font-size:1.5em;'>You are here.</span>");
+      map.setCenter(pos);
+
+      var marker = new google.maps.Marker({
+        map: map,
+        position: pos,
+        icon: {
+          url: 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2%7Cef8319',
+          anchor: new google.maps.Point(10, 10),
+          scaledSize: new google.maps.Size(15, 25)
+        }
+      });
+      google.maps.event.addListener(marker, 'click', function() {
+        infoWindow.setContent("<span style='font-weight:bold;color:#EE7600;font-size:1.5em;'>You are here.</span>");
+        infoWindow.open(map, marker);
+      });
+
+      $('#results-for').text("Results for restaurant");
+
+      var request = {
+        location: pos,
+        radius: '500',
+        keyword: 'restaurant',
+      };
+      service.nearbySearch(request, callback);
+    }, function() {
+      handleLocationError(true, infoWindow, map.getCenter());
+    });
+  } else {
+    // Browser doesn't support Geolocation
+    handleLocationError(false, infoWindow, map.getCenter());
+  }
+}
+
+function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+  infoWindow.setPosition(pos);
+  infoWindow.setContent(browserHasGeolocation ?
+                        'Error: The Geolocation service failed.' :
+                        'Error: Your browser doesn\'t support geolocation.');
+}
+
 $(document).ready(function() {
   var sidebar = false;
   var cuisines = ['Chinese', 'Japanese', 'Italian', 'Greek', 'Indian'];
   var searches = [];
 
-  var sortTypes = ['Name','Price','Rating','Popularity','Proximity'];
+  var sortTypes = ['By name','By price range','By rating','By popularity','By proximity'];
 
   var filtertoggle = true;
   var cuisinetoggle = false;
@@ -166,12 +221,22 @@ $(document).ready(function() {
       searches.splice(0, 1);
     }
     $('#search').val(query);
-    if (query != undefined) searches.push(query);
-    //var json_str = JSON.stringify(searches);
-    //createCookie('mycookie', json_str);
-    updateRecentSearches();
-    if (query == undefined) searchQuery('restaurant');
-    else searchQuery(query);
+    if (query == undefined) {
+      var filter = location.search.split('filter=')[1];
+      if (filter == undefined) {
+        initMap();
+        searchQuery('restaurant');
+      } else {
+        if (filter == "near") nearYou();
+      }
+    } else {
+      searches.push(query);
+      //var json_str = JSON.stringify(searches);
+      //createCookie('mycookie', json_str);
+      updateRecentSearches();
+      initMap();
+      searchQuery(query);
+    }
   });
 
   $(window).load(function() {
@@ -245,6 +310,10 @@ $(document).ready(function() {
     window.location.replace('results.html?query=' + query);
   });
 
+  $(document).on('click', '#nearyou', function () {
+    window.location.replace('results.html?filter=near');
+  });
+
   function updateRecentSearches() {
     //var json_str = getCookie('mycookie');
     //var searches = JSON.parse(json_str);
@@ -257,6 +326,7 @@ $(document).ready(function() {
   $(document).on('click', '.filter-search', function () {
     var query = $(this).text();
     $('#search').val(query);
+    initMap();
     searchQuery(query);
   });
 
