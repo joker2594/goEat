@@ -56,7 +56,11 @@ function addMarker(place) {
       return;
     }
     infoWindow.setContent(
+//<<<<<<< HEAD
       "<a href='place.html?id=" + result.id + "' style='color:#008080;text-decoration:none;font-size:1.5em;font-weight:bold;'>" + result.name +
+//=======
+      "<a href='place.html&id=" + result.id + "' style='color:#008080;text-decoration:none;font-size:1.5em;font-weight:bold;'>" + result.name +
+//>>>>>>> 50620984d851ba054424df76507eb8e865300772
       "</a><br/><a class='markerlink' href='place.html?id=" + result.id + "'>Visit page</a> | " +
       "<a class='markerlink' href='" + result.website + "'>Visit website</a><br/>" + result.formatted_address
     );
@@ -67,6 +71,7 @@ function addMarker(place) {
 }
 
 function addResult(place) {
+
   openNow = null;
   if (place.opening_hours)
     openNow = place.opening_hours.open_now ? 'Open now' : 'Closed';
@@ -116,32 +121,6 @@ function searchQuery(query) {
     query: query + ' restaurant',
   }
   service.textSearch(request, callback);
-}
-
-function addPlace(place){
-	 $('#placename').text(places[1].name);
-
-	  openNow = null;
-	  if (place.opening_hours)
-	    openNow = place.opening_hours.open_now ? 'Open now' : 'Closed';
-
-	  var result = '<div class="result">';
-	  if (place.photos)
-	    result += '<img class="restaurant-image" src="' + place.photos[0].getUrl({'maxWidth': 100, 'maxHeight': 100}) + '"/>';
-	  else
-	    result += '<img class="restaurant-image" src="images/restaurant.jpg"/>';
-	  result += '<span class="title">' + place.name + '</span><div class="rating">'+ getRating(place.rating) +'</div>';
-	  result += '<div class="details">';
-	  result += 'Chinese - Chinese dining with dumpling specials<br/>' + place.formatted_address + '<br/>';
-	  if (openNow)
-	    result += openNow;
-	  else
-	    result += 'No info about opening hours';
-	  result += '</div></div>';
-
-	$('#place').append(result);
-
-
 }
 
 var createCookie = function(name, value, days) {
@@ -231,6 +210,8 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
 
 $(document).ready(function() {
   var sidebar = false;
+  var sortbar = false;
+
   var cuisines = ['Chinese', 'Japanese', 'Italian', 'Greek', 'Indian'];
   var searches = [];
 
@@ -317,22 +298,22 @@ $(document).ready(function() {
   });
 
   $('#filtertoggle').click(function() {
-    if (filtertoggle) $(this).attr("src", "images/expand.png");
-    else $(this).attr("src", "images/shrink.png");
+    if (filtertoggle) $('#filtertoggle > img').attr("src", "images/expand.png");
+    else $('#filtertoggle > img').attr("src", "images/shrink.png");
     filtertoggle = !filtertoggle;
     $('#filters').toggle();
   });
 
   $('#cuisinetoggle').click(function() {
-    if (cuisinetoggle) $(this).attr("src", "images/expand.png");
-    else $(this).attr("src", "images/shrink.png");
+    if (cuisinetoggle) $('#cuisinetoggle > img').attr("src", "images/expand.png");
+    else $('#cuisinetoggle > img').attr("src", "images/shrink.png");
     cuisinetoggle = !cuisinetoggle;
     $('#cats').toggle();
   });
 
   $('#searchtoggle').click(function() {
-    if (searchtoggle) $(this).attr("src", "images/expand.png");
-    else $(this).attr("src", "images/shrink.png");
+    if (searchtoggle) $('#searchtoggle > img').attr("src", "images/expand.png");
+    else $('#searchtoggle > img').attr("src", "images/shrink.png");
     searchtoggle = !searchtoggle;
     $('#searchhistory').toggle();
   });
@@ -388,5 +369,17 @@ $(document).ready(function() {
     if(e.keyCode == 13) {
       $(this).trigger("enterKey");
     }
+  });
+
+  $('#sortbox').click(function() {
+    if (sortbar) {
+      $('#sortbar').css("display", "none");
+      $('#sortbox > img').attr("src", "images/expand.png");
+    }
+    else {
+      $('#sortbar').css("display", "table");
+      $('#sortbox > img').attr("src", "images/shrink.png");
+    }
+    sortbar = !sortbar;
   });
 });

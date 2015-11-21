@@ -14,21 +14,27 @@
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBFSaTpf802VTdXvM19FJpnp_5IvPt2kuo&callback=initMap&libraries=places">
     </script>
     <div id="wrapper">
+
+      <!-- HEADER  -->
       <div id="header">
         <div id="sidebaricon"></div>
         <div onclick="location.href='index.html'" id="logo">goEat</div>
         <div id="searchbox"><input id="search" type="text" placeholder="Search for dishes or restaurants..." /></div>
       </div>
+
+      <!-- SIDEBAR -->
       <div id="sidebar"><div style="height: 3em;"></div>
-        <div class="category">Filter<img id="filtertoggle" class="catshrink" src='images/shrink.png'/></div>
+        <div id="filtertoggle" class="category">Filter<img class="catshrink" src='images/shrink.png'/></div>
         <div id="filters">
           <div id="popular" class="filter">Most popular</div>
           <div class="filter">Top rated</div>
           <div id="nearyou" class="filter">Near you</div>
         </div>
-        <div class="category">Cuisine<img id="cuisinetoggle" class="catexpand" src='images/expand.png'/></div><div id="cats"></div>
-        <div class="category">Recent Searches<img id="searchtoggle" class="catexpand" src='images/expand.png'/></div><div id="searchhistory"></div>
+        <div id="cuisinetoggle" class="category">Cuisine<img class="catexpand" src='images/expand.png'/></div><div id="cats"></div>
+        <div id="searchtoggle" class="category">Recent Searches<img class="catexpand" src='images/expand.png'/></div><div id="searchhistory"></div>
       </div>
+
+      <!-- MAP -->
       <div class="genwrapper"><div id="map"></div></div>
     </div>
   </body>

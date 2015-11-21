@@ -49,12 +49,11 @@
 
   $(window).load(function(){
      //var place = location.search.split("&")[0].replace("?","").split("=")[1]
-     searchQuery('restaurant');
-     place=results[1];
- $('#placename').text(place);
+	searchQuery('restaurant');
+   	place=places[0];
 
-     if (place != undefined) 
 	addPlace(place);
+	$('#placename').text(place);
   });
 
 

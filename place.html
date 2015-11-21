@@ -10,6 +10,7 @@
   <body>
     <script src="jquery.js"></script>
     <script src="script.js"></script>
+    <script src="placeScript.js"></script>
     <script async defer
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBFSaTpf802VTdXvM19FJpnp_5IvPt2kuo&callback=initMap&libraries=places">
     </script>
@@ -44,18 +45,3 @@
   </body>
 </html>
 
-<script>
-
-
-  $(window).load(function(){
-     //var place = location.search.split("&")[0].replace("?","").split("=")[1]
-     searchQuery('restaurant');
-     place=results[1];
-     $('#placename').text(place);
-
-     if (place != undefined) 
-	addPlace(place);
-  });
-
-
-</script>
