@@ -51,7 +51,7 @@
      //var place = location.search.split("&")[0].replace("?","").split("=")[1]
      searchQuery('restaurant');
      place=results[1];
-     $('#placename').text(place);
+ $('#placename').text(place);
 
      if (place != undefined) 
 	addPlace(place);
