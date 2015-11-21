@@ -141,7 +141,7 @@ function addPlace(place){
 	    result += 'No info about opening hours';
 	  result += '</div></div>';
 
-	$('#place').append(result);
+	$('#place').append(resresult);
 
 
 }

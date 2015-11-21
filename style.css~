@@ -142,7 +142,7 @@ body {
 #placeheader{
 	cursor: default;
 	width: auto;
-	padding: 1em;
+	padding: 1.5em;
 	color: white;
 	background-color: #198c8c;
 	z-index: -1;

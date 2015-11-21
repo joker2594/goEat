@@ -29,14 +29,13 @@
         <div class="category">Cuisine<img id="cuisinetoggle" class="catexpand" src='images/expand.png'/></div><div id="cats"></div>
         <div class="category">Recent Searches<img id="searchtoggle" class="catexpand" src='images/expand.png'/></div><div id="searchhistory"></div>
       </div>
-      <div class="genwrapper"><div style="width:65%" id="map"></div></div>
-      <div id="results">
+      <div class="genwrapper"><div style="width:40%" id="map"></div></div>
+      <div id="place">
         <div style="height: 3em;"></div>
         <div class="genwrapper">
-          <div id="resultsheader"><span id="results-for">Results for </span><div id="sortbox">sort by <img id="sort" src='images/expand.png'/></div></div>
+          <div id="placeheader"><span id="placename"> </span>
         </div>
         <div style="height: 3.1em;"></div>
-
       </div>
     </div>
   </body>
