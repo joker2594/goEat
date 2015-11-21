@@ -56,8 +56,8 @@ function addMarker(place) {
       return;
     }
     infoWindow.setContent(
-	 "<a href='place.html&id=" + result.id + "' style='color:#008080;text-decoration:none;font-size:1.5em;font-weight:bold;'>" + result.name +
-	"</a><br/><a class='markerlink' href='place.html&id=" + result.id + "'>Visit page</a> | " +
+      "<a href='restaurant.html&id=" + result.id + "' style='color:#008080;text-decoration:none;font-size:1.5em;font-weight:bold;'>" + result.name +
+      "</a><br/><a class='markerlink' href='place.html?id=" + result.id + "'>Visit page</a> | " +
       "<a class='markerlink' href='" + result.website + "'>Visit website</a><br/>" + result.formatted_address
     );
     infoWindow.open(map, marker);
@@ -113,14 +113,14 @@ function searchQuery(query) {
   var request = {
     location: clocation,
     radius: '5000',
-    query: query + ' restaurant'
+    query: query + ' restaurant',
   }
   service.textSearch(request, callback);
 }
 
 function addPlace(place){
 	searchQuery('restaurant');
-	
+
 	 $('#placename').text(place);
 
 	  openNow = null;
@@ -145,7 +145,6 @@ function addPlace(place){
 
 
 }
-
 
 var createCookie = function(name, value, days) {
     var expires;
@@ -183,7 +182,6 @@ function nearYou() {
   infoWindow = new google.maps.InfoWindow({map: map});
 
   // Try HTML5 geolocation.
-  console.log("near you");
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function(position) {
       var pos = {
@@ -209,7 +207,7 @@ function nearYou() {
         infoWindow.open(map, marker);
       });
 
-      $('#results-for').text("Results for restaurant");
+      $('#results-for').text("Near You");
 
       var request = {
         location: pos,
@@ -238,7 +236,7 @@ $(document).ready(function() {
   var cuisines = ['Chinese', 'Japanese', 'Italian', 'Greek', 'Indian'];
   var searches = [];
 
-  var sortTypes = ['By name','By price range','By rating','By popularity','By proximity'];
+  var sortTypes = ['Name','Price range','Rating','Popularity','Proximity'];
 
   var filtertoggle = true;
   var cuisinetoggle = false;
@@ -257,6 +255,10 @@ $(document).ready(function() {
         searchQuery('restaurant');
       } else {
         if (filter == "near") nearYou();
+        if (filter == "popular") {
+          searchQuery("");
+          $('#results-for').text("Most Popular");
+        }
       }
     } else {
       searches.push(query);
@@ -280,12 +282,12 @@ $(document).ready(function() {
     }
   });
 
- $(window).load(function(){
-  var place = location.search.split("&")[0].replace("?","").split("=")[1]
-  searchQuery('restaurant');
-  if (place != undefined) addPlace(place);
-
-  });
+ //  $(window).load(function(){
+ //    var place = location.search.split("&")[0].replace("?","").split("=")[1]
+ //    searchQuery('restaurant');
+ //    if (place != undefined) addPlace(place);
+ //
+ // });
 
   $('#sidebaricon').hover(function() {
     $(this).css("background-image", "url('images/sidebarselected.png')");
@@ -348,6 +350,10 @@ $(document).ready(function() {
 
   $(document).on('click', '#nearyou', function () {
     window.location.replace('results.html?filter=near');
+  });
+
+  $(document).on('click', '#popular', function () {
+    window.location.replace('results.html?filter=popular');
   });
 
   function updateRecentSearches() {
