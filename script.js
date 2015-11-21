@@ -197,7 +197,7 @@ function nearYou() {
         map: map,
         position: pos,
         icon: {
-          url: 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2%7Cef8319',
+          url: 'images/home.png',
           anchor: new google.maps.Point(10, 10),
           scaledSize: new google.maps.Size(15, 25)
         }
@@ -235,8 +235,6 @@ $(document).ready(function() {
   var sidebar = false;
   var cuisines = ['Chinese', 'Japanese', 'Italian', 'Greek', 'Indian'];
   var searches = [];
-
-  var sortTypes = ['Name','Price range','Rating','Popularity','Proximity'];
 
   var filtertoggle = true;
   var cuisinetoggle = false;
