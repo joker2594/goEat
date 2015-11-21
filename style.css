@@ -59,7 +59,7 @@ body {
 #sidebar {
 	overflow: scroll;
 	height: auto;
-	position: relative;
+	position: fixed;
 	display: none;
 	width: 17em;
 	background-color: white;

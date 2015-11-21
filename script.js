@@ -141,7 +141,7 @@ function getCookie(c_name) {
 
 $(document).ready(function() {
   var sidebar = false;
-  var cuisines = ['Chinese', 'Japanese', 'Italian', 'Greek', 'American', 'Indian', 'African'];
+  var cuisines = ['Chinese', 'Japanese', 'Italian', 'Greek', 'Indian'];
   var searches = [];
 
   var sortTypes = ['Name','Price','Rating','Popularity','Proximity'];
