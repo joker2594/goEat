@@ -139,15 +139,6 @@ function getCookie(c_name) {
     return "";
 }
 
-function updateRecentSearches() {
-  var json_str = getCookie('mycookie');
-  var searches = JSON.parse(json_str);
-  var bound = searches.length > 5 ? 5 : searches.length;
-  for (i = 0; i < bound; i++) {
-    $('#searchhistory').append("<div class=\'filter filter-search\' searchitem>" + searches[i] + "</div> ");
-  }
-}
-
 $(document).ready(function() {
   var sidebar = false;
   var cuisines = ['Chinese', 'Japanese', 'Italian', 'Greek', 'American', 'Indian', 'African'];
@@ -166,8 +157,8 @@ $(document).ready(function() {
     }
     $('#search').val(query);
     if (query != undefined) searches.push(query);
-    var json_str = JSON.stringify(searches);
-    createCookie('mycookie', json_str);
+    //var json_str = JSON.stringify(searches);
+    //createCookie('mycookie', json_str);
     updateRecentSearches();
     if (query == undefined) searchQuery('restaurant');
     else searchQuery(query);
@@ -238,11 +229,20 @@ $(document).ready(function() {
   });
 
   $(document).on('click', '.filter-cuisine', function () {
-  var query = $(this).data('cuisineitem');
-  //$('#search').val(query);
-  //searchQuery(query);
-  window.location.replace('results.html?query=' + query);
-});
+    var query = $(this).data('cuisineitem');
+    //$('#search').val(query);
+    //searchQuery(query);
+    window.location.replace('results.html?query=' + query);
+  });
+
+  function updateRecentSearches() {
+    //var json_str = getCookie('mycookie');
+    //var searches = JSON.parse(json_str);
+    var bound = searches.length > 5 ? 5 : searches.length;
+    for (i = 0; i < bound; i++) {
+      $('#searchhistory').append("<div class=\'filter filter-search\' searchitem>" + searches[i] + "</div> ");
+    }
+  }
 
   $(document).on('click', '.filter-search', function () {
     var query = $(this).text();
