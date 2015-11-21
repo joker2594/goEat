@@ -75,7 +75,7 @@ function addResult(place) {
     result += '<img class="restaurant-image" src="' + place.photos[0].getUrl({'maxWidth': 100, 'maxHeight': 100}) + '"/>';
   else
     result += '<img class="restaurant-image" src="images/restaurant.jpg"/>';
-  result += '<span class="title">' + place.name + '</span><div class="rating">★★★★★</div>';
+  result += '<span class="title">' + place.name + '</span><div class="rating">'+createRating(place.rating)+'</div>';
   result += '<div class="details">';
   result += 'Chinese - Chinese dining with dumpling specials<br/>' + place.formatted_address + '<br/>';
   if (openNow)
@@ -85,6 +85,16 @@ function addResult(place) {
   result += '</div></div>';
 
   $('#results').append(result);
+}
+
+
+function createRating(rating) {
+  // round rating 
+  var rate = Math.round(rating);
+  var stars = "";
+  for (var i = 0; i<rate; i++) stars +="★";
+  for (var i = rate; i<5; i++) stars +="☆";
+  return stars;
 }
 
 // function clearMarkers() {
