@@ -89,6 +89,7 @@ body {
 	float: left;
 	color: white;
 	background-color: #198c8c;
+	cursor: pointer;
 }
 
 .catexpand, .catshrink {
@@ -125,9 +126,10 @@ body {
 #results {
 	height: inherit;
 	width: 35%;
-	background-color: white;
+	background-color: #fdfdfd;
 	z-index: 0;
 	float: right;
+	cursor: pointer;
 }
 
 #resultsheader {
@@ -136,7 +138,7 @@ body {
 	padding: 1em;
 	color: white;
 	background-color: #198c8c;
-	z-index: -1;
+	z-index: 1;
 }
 
 #placeheader{
@@ -200,4 +202,24 @@ body {
 .markerlink {
 	text-decoration: none;
 	color: #198c8c;
+}
+
+#sortbar {
+	width: inherit;
+	float: right;
+	display: none;
+	z-index: 1;
+	cursor: pointer;
+}
+
+.sortoption {
+	width: 7em;;
+	padding: 1em;
+	margin-left: 4em;
+	font-size: 1em;
+	background-color: white;
+	vertical-align: middle;
+	border: 1px solid #008080;
+	border-top: none;
+	color: black;
 }

@@ -56,7 +56,7 @@ function addMarker(place) {
       return;
     }
     infoWindow.setContent(
-      "<a href='restaurant.html&id=" + result.id + "' style='color:#008080;text-decoration:none;font-size:1.5em;font-weight:bold;'>" + result.name +
+      "<a href='place.html&id=" + result.id + "' style='color:#008080;text-decoration:none;font-size:1.5em;font-weight:bold;'>" + result.name +
       "</a><br/><a class='markerlink' href='place.html?id=" + result.id + "'>Visit page</a> | " +
       "<a class='markerlink' href='" + result.website + "'>Visit website</a><br/>" + result.formatted_address
     );
@@ -233,6 +233,8 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
 
 $(document).ready(function() {
   var sidebar = false;
+  var sortbar = false;
+
   var cuisines = ['Chinese', 'Japanese', 'Italian', 'Greek', 'Indian'];
   var searches = [];
 
@@ -319,22 +321,22 @@ $(document).ready(function() {
   });
 
   $('#filtertoggle').click(function() {
-    if (filtertoggle) $(this).attr("src", "images/expand.png");
-    else $(this).attr("src", "images/shrink.png");
+    if (filtertoggle) $('#filtertoggle > img').attr("src", "images/expand.png");
+    else $('#filtertoggle > img').attr("src", "images/shrink.png");
     filtertoggle = !filtertoggle;
     $('#filters').toggle();
   });
 
   $('#cuisinetoggle').click(function() {
-    if (cuisinetoggle) $(this).attr("src", "images/expand.png");
-    else $(this).attr("src", "images/shrink.png");
+    if (cuisinetoggle) $('#cuisinetoggle > img').attr("src", "images/expand.png");
+    else $('#cuisinetoggle > img').attr("src", "images/shrink.png");
     cuisinetoggle = !cuisinetoggle;
     $('#cats').toggle();
   });
 
   $('#searchtoggle').click(function() {
-    if (searchtoggle) $(this).attr("src", "images/expand.png");
-    else $(this).attr("src", "images/shrink.png");
+    if (searchtoggle) $('#searchtoggle > img').attr("src", "images/expand.png");
+    else $('#searchtoggle > img').attr("src", "images/shrink.png");
     searchtoggle = !searchtoggle;
     $('#searchhistory').toggle();
   });
@@ -390,5 +392,17 @@ $(document).ready(function() {
     if(e.keyCode == 13) {
       $(this).trigger("enterKey");
     }
+  });
+
+  $('#sortbox').click(function() {
+    if (sortbar) {
+      $('#sortbar').css("display", "none");
+      $('#sortbox > img').attr("src", "images/expand.png");
+    }
+    else {
+      $('#sortbar').css("display", "table");
+      $('#sortbox > img').attr("src", "images/shrink.png");
+    }
+    sortbar = !sortbar;
   });
 });
