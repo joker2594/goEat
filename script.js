@@ -3,7 +3,6 @@ var service;
 var clocation;
 var infoWindow;
 
-//var markers = [];
 var places = [];
 var topRatedClicked = false;
 
@@ -11,7 +10,7 @@ function initMap() {
   clocation = new google.maps.LatLng(55.863791, -4.251667);
   map = new google.maps.Map(document.getElementById('map'), {
     center: clocation,
-    zoom: 14
+    zoom: 15
   });
 
   infoWindow = new google.maps.InfoWindow();
@@ -20,17 +19,15 @@ function initMap() {
 
 function indexLoad() {
   var request = {
-    location: clocation,
-    radius: '1000',
+    bounds: map.getBounds(),
     keyword: 'restaurant',
-    maxPriceLevel: 2
+    types: ['restaurant', 'meal_takeaway'],
   };
-  service.textSearch(request, callback);
+  service.radarSearch(request, callback);
 }
 
 function callback(results, status) {
   if (status == google.maps.places.PlacesServiceStatus.OK) {
-    console.log(topRatedClicked);
     if(topRatedClicked){
       // Order by rating
       for(var i=0; i < results.length -1 ; i++)
@@ -42,14 +39,29 @@ function callback(results, status) {
           }
     topRatedClicked = false;
     }
-    console.log(results);
     for (var i = 0; i < results.length; i++) {
       var place = results[i];
       places.push(place);
-      addMarker(results[i]);
       addResult(place);
+      addMarker(place);
     }
-    console.log(places.length);
+  }
+}
+
+function callbacknear(results, status) {
+  if (status == google.maps.places.PlacesServiceStatus.OK) {
+    for (var i = 0; i < 9; i++) {
+      var place = results[i];
+      places.push(place);
+      service.getDetails(place, function(result, status) {
+        if (status !== google.maps.places.PlacesServiceStatus.OK) {
+          console.error(status);
+          return;
+        }
+        addResult(result);
+      });
+      addMarker(place);
+    }
   }
 }
 
@@ -71,48 +83,43 @@ function addMarker(place) {
       return;
     }
     website = "<br/>";
+    var address = "";
+    if (result.formatted_address) address = result.formatted_address.split(', United Kingdom')[0];
     if (result.website) website = "| <a class='markerlink' href='" + result.website + "'>Visit website</a><br/>"
     infoWindow.setContent(
       "<a href='place.html&id=" + result.place_id + "' style='color:#008080;text-decoration:none;font-size:1.5em;font-weight:bold;'>" + result.name +
       "</a><br/><a class='markerlink' href='place.html?id=" + result.place_id + "'>Visit page</a> " +
-      website + result.formatted_address.split(', United Kingdom')[0]
+      website + address
     );
     infoWindow.open(map, marker);
-    //markers.push(marker);
     });
   });
 }
 
 function addResult(place) {
-  // var request = { placeId: result.place_id };
-  // service = new google.maps.places.PlacesService(map);
-  // service.getDetails(request, function(place, status) {
-  //   if (status == google.maps.places.PlacesServiceStatus.OK) {
-      openNow = null;
-      if (place.opening_hours)
-        openNow = place.opening_hours.open_now ? '<b style="color:#EE7600;">Open now!</b>' : 'Closed.';
-      var result = '<div class="result">';
-      if (place.photos)
-        result += '<img class="restaurant-image" src="' + place.photos[0].getUrl({'maxWidth': 100, 'maxHeight': 100}) + '"/>';
-      else
-        result += '<img class="restaurant-image" src="images/restaurant.png"/>';
-      result += '<span class="title">' + place.name + '</span><div class="rating">'+ getRating(place.rating) +'</div>';
-      result += '<div class="details">';
-      var address = place.formatted_address.split(', United Kingdom')[0];
-      var type = place.types[0];
-      if (type == 'meal_takeaway') type = 'Restaurant and takeaway';
-      type = type.charAt(0).toUpperCase() + type.slice(1);
-      result += '<b>Type:</b> ' + type;
-      result += '<br/><b>Address:</b> ' + address + '<br/>';
-      if (openNow)
-        result += openNow;
-      else
-        result += 'No info about opening hours.' + '</div></div>';
-      $('#results').append(result);
-  //   } else {
-  //     console.log('no');
-  //   }
-  // });
+  openNow = null;
+  if (place.opening_hours)
+    openNow = place.opening_hours.open_now ? '<b style="color:#EE7600;">Open now!</b>' : 'Closed.';
+  var result = '<div class="result">';
+  if (place.photos)
+    result += '<img class="restaurant-image" src="' + place.photos[0].getUrl({'maxWidth': 100, 'maxHeight': 100}) + '"/>';
+  else
+    result += '<img class="restaurant-image" src="images/restaurant.png"/>';
+  result += '<span class="title">' + place.name + '</span><div class="rating">'+ getRating(place.rating) +'</div>';
+  result += '<div class="details">';
+  var address = "";
+  if (place.formatted_address) address = place.formatted_address.split(', United Kingdom')[0];
+  var type = "";
+  if (place.types) type = place.types[0];
+  if (type == 'meal_takeaway') type = 'Restaurant and takeaway';
+  type = type.charAt(0).toUpperCase() + type.slice(1);
+  result += '<b>Type:</b> ' + type;
+  result += '<br/><b>Address:</b> ' + address + '<br/>';
+  if (openNow)
+    result += openNow;
+  else
+    result += 'No info about opening hours.' + '</div></div>';
+  $('#results').append(result);
 }
 
 function getRating(rating) {
@@ -124,12 +131,6 @@ function getRating(rating) {
   return stars;
 }
 
-// function clearMarkers() {
-//   for (var i = 0; i < markers.length; i++) {
-//     markers[i].setMap(null);
-//   }
-// }
-
 function searchQuery(query) {
   //clearMarkers();
   places = [];
@@ -140,7 +141,8 @@ function searchQuery(query) {
 
   var request = {
     bounds: map.getBounds(),
-    query: query + ' restaurant',
+    query: query,
+    types: ['restaurant', 'meal_takeaway'],
   }
   service.textSearch(request, callback);
 }
@@ -208,12 +210,12 @@ function nearYou() {
 
       $('#results-for').text("Near You");
 
-      var newrequest = {
-        query: 'restaurant',
+      var request = {
+        types: ['restaurant', 'meal_takeaway'],
         location: pos,
-        radius: 1000
+        radius: 500,
       };
-      service.textSearch(newrequest, callback);
+      service.radarSearch(request, callbacknear);
     }, function() {
       handleLocationError(true, infoWindow, map.getCenter());
     });
@@ -267,7 +269,7 @@ function createPlaceView(place) {
 		result += '<img class="restaurant-image-large" src="' + place.photos[0].getUrl({'maxWidth': 500, 'maxHeight': 300}) + '"/>';
 	else
 		result += '<img class="restaurant-image-large" src="images/restaurant.png"/>';
-	//name and rating 
+	//name and rating
 	result += '<br> <span class="title-placeP">' + place.name + '</span><div class="rating-placeP">'+ getRating(place.rating) +'</div>';
 	//opening hours
 	openNow = null;
@@ -303,6 +305,9 @@ $(document).ready(function() {
   var searchtoggle = false;
 
   $(window).load(function() {
+    // check if at index
+    var page = document.URL.split('goEat/')[1];
+    if (page == 'index.html') return indexLoad();
     var bool = true;
     var query = location.search.split('query=')[1];
     if (searches.length >= 5) {
@@ -321,16 +326,16 @@ $(document).ready(function() {
         var filter = location.search.split('filter=')[1];
         if (filter == undefined) {
           initMap();
-          searchQuery('restaurant');
+          searchQuery("restaurant");
         } else {
           if (filter == "near") nearYou();
           if (filter == "popular") {
-            searchQuery("");
+            searchQuery("restaurant");
             $('#results-for').text("Most Popular");
           }
           if (filter == "toprated") {
             topRatedClicked = true;
-            searchQuery("");
+            searchQuery("restaurant");
             $('#results-for').text("Top Rated");
           }
         }
@@ -356,13 +361,6 @@ $(document).ready(function() {
       $('#searchhistory').append("<div class=\'filter\' searchitem>" + searches[i] + "</div> ");
     }
   });
-
- //  $(window).load(function(){
- //    var place = location.search.split("&")[0].replace("?","").split("=")[1]
- //    searchQuery('restaurant');
- //    if (place != undefined) addPlace(place);
- //
- // });
 
   $('#sidebaricon').hover(function() {
     $(this).css("background-image", "url('images/sidebarselected.png')");
