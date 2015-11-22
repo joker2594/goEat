@@ -268,7 +268,7 @@ function createPlaceView(place) {
 	else
 		result += '<img class="restaurant-image-large" src="images/restaurant.png"/>';
 	//name and rating 
-	result += '<br> <span class="title-placeP">' + place.name + '</span><div class="rating-placeP">'+ getRating(place.rating) +'</div>';
+	result += '<span class="title-placeP">' + place.name + '</span><div class="rating-placeP">'+ getRating(place.rating) +'</div>';
 	//opening hours
 	openNow = null;
 	if (place.opening_hours)
