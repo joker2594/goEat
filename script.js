@@ -433,13 +433,18 @@ $(document).ready(function() {
     var sorted = places.slice();
     switch (option) {
       case "name":
+        for (var i = 0; i < sorted.length -1 ; i++)
+          for (var j = i+1; j < sorted.length; j++)
+            if (sorted[i].name > sorted[j].name) {
+              var aux = sorted[i];
+              sorted[i] = sorted[j];
+              sorted[j] = aux;
+            }
         break;
       case "rating":
         sorted = sortByRating(sorted);
         break;
       case "proximity":
-        break;
-      case "pricerange":
         break;
       default:
         break;
