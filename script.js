@@ -20,11 +20,11 @@ function initMap() {
 function indexLoad() {
   var request = {
     location: clocation,
-    radius: '5000',
+    radius: '1000',
     keyword: 'restaurant',
     maxPriceLevel: 2
   };
-  service.radarSearch(request, callback);
+  service.textSearch(request, callback);
 }
 
 function callback(results, status) {
@@ -35,6 +35,7 @@ function callback(results, status) {
       addMarker(results[i]);
       addResult(place);
     }
+    console.log(places.length);
   }
 }
 
@@ -55,10 +56,12 @@ function addMarker(place) {
       console.error(status);
       return;
     }
+    website = "<br/>";
+    if (result.website) website = "| <a class='markerlink' href='" + result.website + "'>Visit website</a><br/>"
     infoWindow.setContent(
       "<a href='place.html&id=" + result.place_id + "' style='color:#008080;text-decoration:none;font-size:1.5em;font-weight:bold;'>" + result.name +
-      "</a><br/><a class='markerlink' href='place.html?id=" + result.place_id + "'>Visit page</a> | " +
-      "<a class='markerlink' href='" + result.website + "'>Visit website</a><br/>" + result.formatted_address.split(', United Kingdom')[0]
+      "</a><br/><a class='markerlink' href='place.html?id=" + result.place_id + "'>Visit page</a> " +
+      website + result.formatted_address.split(', United Kingdom')[0]
     );
     infoWindow.open(map, marker);
     //markers.push(marker);
@@ -66,11 +69,11 @@ function addMarker(place) {
   });
 }
 
-function addResult(result) {
-  var request = { placeId: result.place_id };
-  service = new google.maps.places.PlacesService(map);
-  service.getDetails(request, function(place, status) {
-    if (status == google.maps.places.PlacesServiceStatus.OK) {
+function addResult(place) {
+  // var request = { placeId: result.place_id };
+  // service = new google.maps.places.PlacesService(map);
+  // service.getDetails(request, function(place, status) {
+  //   if (status == google.maps.places.PlacesServiceStatus.OK) {
       openNow = null;
       if (place.opening_hours)
         openNow = place.opening_hours.open_now ? '<b style="color:#EE7600;">Open now!</b>' : 'Closed.';
@@ -79,17 +82,23 @@ function addResult(result) {
         result += '<img class="restaurant-image" src="' + place.photos[0].getUrl({'maxWidth': 100, 'maxHeight': 100}) + '"/>';
       else
         result += '<img class="restaurant-image" src="images/restaurant.png"/>';
-        result += '<span class="title">' + place.name + '</span><div class="rating">'+ getRating(place.rating) +'</div>';
-        result += '<div class="details">';
-        var address = place.formatted_address.split(', United Kingdom')[0];
-        result += '<b>Phone number</b>: ' + place.formatted_phone_number + '<br/><b>Address</b>: ' + address + '<br/>';
+      result += '<span class="title">' + place.name + '</span><div class="rating">'+ getRating(place.rating) +'</div>';
+      result += '<div class="details">';
+      var address = place.formatted_address.split(', United Kingdom')[0];
+      var type = place.types[0];
+      if (type == 'meal_takeaway') type = 'Restaurant and takeaway';
+      type = type.charAt(0).toUpperCase() + type.slice(1);
+      result += '<b>Type:</b> ' + type;
+      result += '<br/><b>Address:</b> ' + address + '<br/>';
       if (openNow)
         result += openNow;
       else
         result += 'No info about opening hours.' + '</div></div>';
       $('#results').append(result);
-    }
-  });
+  //   } else {
+  //     console.log('no');
+  //   }
+  // });
 }
 
 function getRating(rating) {
@@ -116,8 +125,7 @@ function searchQuery(query) {
   $('#results-for').text("Results for " + query);
 
   var request = {
-    location: clocation,
-    radius: '5000',
+    bounds: map.getBounds(),
     query: query + ' restaurant',
   }
   service.textSearch(request, callback);
@@ -154,7 +162,7 @@ function getCookie(c_name) {
 function nearYou() {
   map = new google.maps.Map(document.getElementById('map'), {
     center: clocation,
-    zoom: 14,
+    zoom: 16,
   });
   infoWindow = new google.maps.InfoWindow({map: map});
 
@@ -186,12 +194,12 @@ function nearYou() {
 
       $('#results-for').text("Near You");
 
-      var request = {
+      var newrequest = {
+        query: 'restaurant',
         location: pos,
-        radius: '500',
-        keyword: 'restaurant',
+        radius: 1000
       };
-      service.nearbySearch(request, callback);
+      service.textSearch(newrequest, callback);
     }, function() {
       handleLocationError(true, infoWindow, map.getCenter());
     });
