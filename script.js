@@ -26,21 +26,27 @@ function indexLoad() {
   service.radarSearch(request, callback);
 }
 
+function sortByRating(list) {
+  var sorted = list;
+  for (var i=0; i < sorted.length -1 ; i++)
+    for (var j=i+1; j < sorted.length; j++)
+      if (sorted[i].rating<sorted[j].rating){
+        var aux = sorted[i];
+        sorted[i]=sorted[j];
+        sorted[j]=aux;
+      }
+  return sorted;
+}
+
 function callback(results, status) {
   if (status == google.maps.places.PlacesServiceStatus.OK) {
-    if(topRatedClicked){
-      // Order by rating
-      for(var i=0; i < results.length -1 ; i++)
-        for (var j=i+1; j < results.length; j++)
-          if (results[i].rating<results[j].rating){
-            var aux = results[i];
-            results[i]=results[j];
-            results[j]=aux;
-          }
-    topRatedClicked = false;
+    if (topRatedClicked) {
+      results = sortByRating(results);
+      topRatedClicked = false;
     }
     for (var i = 0; i < results.length; i++) {
       var place = results[i];
+      if (!place.rating) place.rating = 0;
       places.push(place);
       addResult(place);
       addMarker(place);
@@ -126,6 +132,7 @@ function getRating(rating) {
   // round rating
   var rate = Math.round(rating);
   var stars = "";
+  if (rate == 0) return stars;
   for (var i = 0; i < rate; i++) stars += "★";
   for (var i = rate; i < 5; i++) stars += "☆";
   return stars;
@@ -293,6 +300,13 @@ function createPlaceView(place) {
       $('#place').append(result);
 }
 
+function showResults(places) {
+  for (var i = 0; i < places.length; i++) {
+    var place = places[i];
+    addResult(place);
+  }
+}
+
 $(document).ready(function() {
   var sidebar = false;
   var sortbar = false;
@@ -398,6 +412,42 @@ $(document).ready(function() {
     $(this).css("background-color", "#f39f4c");
     var id = $(this).data('id');
     window.location.replace('place.html?id=' + id);
+  });
+
+  $(document).on("mouseenter", ".sortoption", function() {
+    $(this).css("background-color", "#f19132");
+    $(this).css("color", "#ffffff");
+  });
+
+  $(document).on("mouseleave", ".sortoption", function() {
+    $(this).css("background-color", "#ffffff");
+    $(this).css("color", "#000000");
+  });
+
+  $(document).on("click", ".sortoption", function() {
+    var option = $(this).data('option');
+    // hide results
+    $('.result').each(function () {
+      $(this).remove();
+    });
+    var sorted = places.slice();
+    switch (option) {
+      case "name":
+        break;
+      case "rating":
+        sorted = sortByRating(sorted);
+        break;
+      case "proximity":
+        break;
+      case "pricerange":
+        break;
+      default:
+        break;
+    }
+    showResults(sorted);
+    $('#sortbar').css("display", "none");
+    $('#sortbox > img').attr("src", "images/expand.png");
+    sortbar = false;
   });
 
   $('#sidebaricon').click(function() {
