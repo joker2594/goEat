@@ -5,6 +5,7 @@ var infoWindow;
 
 //var markers = [];
 var places = [];
+var topRatedClicked = false;
 
 function initMap() {
   clocation = new google.maps.LatLng(55.863791, -4.251667);
@@ -29,6 +30,19 @@ function indexLoad() {
 
 function callback(results, status) {
   if (status == google.maps.places.PlacesServiceStatus.OK) {
+    console.log(topRatedClicked);
+    if(topRatedClicked){
+      // Order by rating
+      for(var i=0; i < results.length -1 ; i++)
+        for (var j=i+1; j < results.length; j++)
+          if (results[i].rating<results[j].rating){
+            var aux = results[i];
+            results[i]=results[j];
+            results[j]=aux;
+          }
+    topRatedClicked = false;
+    }
+    console.log(results);
     for (var i = 0; i < results.length; i++) {
       var place = results[i];
       places.push(place);
@@ -285,6 +299,11 @@ $(document).ready(function() {
             searchQuery("");
             $('#results-for').text("Most Popular");
           }
+          if (filter == "toprated") {
+            topRatedClicked = true;
+            searchQuery("");
+            $('#results-for').text("Top Rated");
+          }
         }
       }
     } else {
@@ -340,7 +359,6 @@ $(document).ready(function() {
   $(document).on("mouseout", ".result", function() {
     $(this).css("background-color", "#ffffff");
   });
-
   $('#sidebaricon').click(function() {
     if (sidebar) $('#sidebar').css("display", "none");
     else $('#sidebar').css("display", "table");
@@ -382,6 +400,10 @@ $(document).ready(function() {
   $(document).on('click', '#popular', function () {
     window.location.replace('results.html?filter=popular');
   });
+  $(document).on('click', '#toprated', function () {
+    window.location.replace('results.html?filter=toprated');
+  });
+
 
   function updateRecentSearches() {
     //var json_str = getCookie('mycookie');
