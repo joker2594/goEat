@@ -58,7 +58,7 @@ function addMarker(place) {
     infoWindow.setContent(
       "<a href='place.html&id=" + result.place_id + "' style='color:#008080;text-decoration:none;font-size:1.5em;font-weight:bold;'>" + result.name +
       "</a><br/><a class='markerlink' href='place.html?id=" + result.place_id + "'>Visit page</a> | " +
-      "<a class='markerlink' href='" + result.website + "'>Visit website</a><br/>" + result.formatted_address
+      "<a class='markerlink' href='" + result.website + "'>Visit website</a><br/>" + result.formatted_address.split(', United Kingdom')[0]
     );
     infoWindow.open(map, marker);
     //markers.push(marker);
@@ -66,26 +66,30 @@ function addMarker(place) {
   });
 }
 
-function addResult(place) {
-
-  openNow = null;
-  if (place.opening_hours)
-    openNow = place.opening_hours.open_now ? 'Open now' : 'Closed';
-  var result = '<div class="result">';
-  if (place.photos)
-    result += '<img class="restaurant-image" src="' + place.photos[0].getUrl({'maxWidth': 100, 'maxHeight': 100}) + '"/>';
-  else
-    result += '<img class="restaurant-image" src="images/restaurant.jpg"/>';
-  result += '<span class="title">' + place.name + '</span><div class="rating">'+ getRating(place.rating) +'</div>';
-  result += '<div class="details">';
-  result += 'Chinese - Chinese dining with dumpling specials<br/>' + place.formatted_address + '<br/>';
-  if (openNow)
-    result += openNow;
-  else
-    result += 'No info about opening hours';
-  result += '</div></div>';
-
-  $('#results').append(result);
+function addResult(result) {
+  var request = { placeId: result.place_id };
+  service = new google.maps.places.PlacesService(map);
+  service.getDetails(request, function(place, status) {
+    if (status == google.maps.places.PlacesServiceStatus.OK) {
+      openNow = null;
+      if (place.opening_hours)
+        openNow = place.opening_hours.open_now ? '<b style="color:#EE7600;">Open now!</b>' : 'Closed.';
+      var result = '<div class="result">';
+      if (place.photos)
+        result += '<img class="restaurant-image" src="' + place.photos[0].getUrl({'maxWidth': 100, 'maxHeight': 100}) + '"/>';
+      else
+        result += '<img class="restaurant-image" src="images/restaurant.jpg"/>';
+        result += '<span class="title">' + place.name + '</span><div class="rating">'+ getRating(place.rating) +'</div>';
+        result += '<div class="details">';
+        var address = place.formatted_address.split(', United Kingdom')[0];
+        result += '<b>Phone number</b>: ' + place.formatted_phone_number + '<br/><b>Address</b>: ' + address + '<br/>';
+      if (openNow)
+        result += openNow;
+      else
+        result += 'No info about opening hours.' + '</div></div>';
+      $('#results').append(result);
+    }
+  });
 }
 
 function getRating(rating) {
