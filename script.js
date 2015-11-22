@@ -100,7 +100,7 @@ function addResult(place) {
   openNow = null;
   if (place.opening_hours)
     openNow = place.opening_hours.open_now ? '<b style="color:#EE7600;">Open now!</b>' : 'Closed.';
-  var result = '<div class="result">';
+  var result = '<div class="result" data-id=' + place.place_id + '>';
   if (place.photos)
     result += '<img class="restaurant-image" src="' + place.photos[0].getUrl({'maxWidth': 100, 'maxHeight': 100}) + '"/>';
   else
@@ -369,23 +369,37 @@ $(document).ready(function() {
     $(this).css("background-image", "url('images/sidebar.png')");
   });
 
+  $('.result').hover(function() {
+    $(this).css("background-color", "blue");
+  },
+  function() {
+    $(this).css("background-color", "black");
+  });
+
   $(document).on("mouseenter", ".filter", function() {
     $(this).css("background-color", "#f19132");
     $(this).css("color", "#ffffff");
   });
 
-  $(document).on("mouseout", ".filter", function() {
+  $(document).on("mouseleave", ".filter", function() {
     $(this).css("background-color", "#ffffff");
     $(this).css("color", "#000000");
   });
 
   $(document).on("mouseenter", ".result", function() {
-    $(this).css("background-color", "#f19132");
+    $(this).css("background-color", "#eeeeee");
   });
 
-  $(document).on("mouseout", ".result", function() {
-    $(this).css("background-color", "#ffffff");
+  $(document).on("mouseleave", ".result", function() {
+    $(this).css("background-color", "#fdfdfd");
   });
+
+  $(document).on("click", ".result", function() {
+    $(this).css("background-color", "#f39f4c");
+    var id = $(this).data('id');
+    window.location.replace('place.html?id=' + id);
+  });
+
   $('#sidebaricon').click(function() {
     if (sidebar) $('#sidebar').css("display", "none");
     else $('#sidebar').css("display", "table");

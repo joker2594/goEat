@@ -130,7 +130,6 @@ body {
 	background-color: #fdfdfd;
 	z-index: 0;
 	float: right;
-	cursor: pointer;
 }
 
 #resultsheader {
@@ -171,11 +170,11 @@ body {
 	min-height: 104px;
 	width: auto;
 	border-bottom: solid #008080 1px;
-	z-index: -1;
 	padding-top: 4px;
 	padding-right: 2px;
+	cursor: pointer;
+	z-index: 1;
 }
-
 
 .title {
 	padding: 5px;
@@ -220,7 +219,7 @@ body {
 }
 
 .restaurant-image-large {
-	
+
 	height: 300px;
 	width: 500px;
 	border: 1px solid #EE7600;
