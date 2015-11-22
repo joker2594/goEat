@@ -56,12 +56,8 @@ function addMarker(place) {
       return;
     }
     infoWindow.setContent(
-//<<<<<<< HEAD
-      "<a href='place.html?id=" + result.id + "' style='color:#008080;text-decoration:none;font-size:1.5em;font-weight:bold;'>" + result.name +
-//=======
-      "<a href='place.html&id=" + result.id + "' style='color:#008080;text-decoration:none;font-size:1.5em;font-weight:bold;'>" + result.name +
-//>>>>>>> 50620984d851ba054424df76507eb8e865300772
-      "</a><br/><a class='markerlink' href='place.html?id=" + result.id + "'>Visit page</a> | " +
+      "<a href='place.html&id=" + result.place_id + "' style='color:#008080;text-decoration:none;font-size:1.5em;font-weight:bold;'>" + result.name +
+      "</a><br/><a class='markerlink' href='place.html?id=" + result.place_id + "'>Visit page</a> | " +
       "<a class='markerlink' href='" + result.website + "'>Visit website</a><br/>" + result.formatted_address
     );
     infoWindow.open(map, marker);
@@ -208,6 +204,38 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
                         'Error: Your browser doesn\'t support geolocation.');
 }
 
+function callbackid(place, status) {
+  if (status == google.maps.places.PlacesServiceStatus.OK) {
+    map = new google.maps.Map(document.getElementById('map'), {
+      center: place.geometry.location,
+      zoom: 17
+    });
+
+    var infoWindow = new google.maps.InfoWindow({
+      content:"<a style='color:#008080;text-decoration:none;font-size:2em;font-weight:bold;'>" + place.name + "</a>"
+    });
+
+    var marker = new google.maps.Marker({
+      map: map,
+      position: place.geometry.location,
+      icon: {
+        url: 'images/marker.png',
+        anchor: new google.maps.Point(10, 10),
+        scaledSize: new google.maps.Size(25, 40)
+      }
+    });
+
+    marker.addListener('click', function() {
+      infoWindow.open(map, marker);
+    });
+    createPlaceView(place);
+  }
+}
+
+function createPlaceView(place) {
+  $('#placeheader').text(place.name);
+}
+
 $(document).ready(function() {
   var sidebar = false;
   var sortbar = false;
@@ -220,21 +248,31 @@ $(document).ready(function() {
   var searchtoggle = false;
 
   $(window).load(function() {
+    var bool = true;
     var query = location.search.split('query=')[1];
     if (searches.length >= 5) {
       searches.splice(0, 1);
     }
     $('#search').val(query);
     if (query == undefined) {
-      var filter = location.search.split('filter=')[1];
-      if (filter == undefined) {
-        initMap();
-        searchQuery('restaurant');
-      } else {
-        if (filter == "near") nearYou();
-        if (filter == "popular") {
-          searchQuery("");
-          $('#results-for').text("Most Popular");
+      var id = location.search.split('id=')[1];
+      if (id != undefined) {
+        var request = { placeId: id };
+        service = new google.maps.places.PlacesService(map);
+        service.getDetails(request, callbackid);
+        var bool = false;
+      }
+      if (bool) {
+        var filter = location.search.split('filter=')[1];
+        if (filter == undefined) {
+          initMap();
+          searchQuery('restaurant');
+        } else {
+          if (filter == "near") nearYou();
+          if (filter == "popular") {
+            searchQuery("");
+            $('#results-for').text("Most Popular");
+          }
         }
       }
     } else {
