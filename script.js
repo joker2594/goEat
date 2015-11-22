@@ -1,10 +1,12 @@
 var map;
 var service;
 var clocation;
+var ulocation = null;
 var infoWindow;
 
 var places = [];
 var topRatedClicked = false;
+var locationGiven = false;
 
 function initMap() {
   clocation = new google.maps.LatLng(55.863791, -4.251667);
@@ -46,8 +48,7 @@ function callback(results, status) {
     }
     for (var i = 0; i < results.length; i++) {
       var place = results[i];
-      if (!place.rating) place.rating = 0;
-      places.push(place);
+      store(place);
       addResult(place);
       addMarker(place);
     }
@@ -58,17 +59,23 @@ function callbacknear(results, status) {
   if (status == google.maps.places.PlacesServiceStatus.OK) {
     for (var i = 0; i < 9; i++) {
       var place = results[i];
-      places.push(place);
       service.getDetails(place, function(result, status) {
         if (status !== google.maps.places.PlacesServiceStatus.OK) {
           console.error(status);
           return;
         }
+        store(result);
         addResult(result);
       });
       addMarker(place);
     }
   }
+}
+
+function store(place) {
+  if (!place.rating) place.rating = 0;
+  place.distance = (google.maps.geometry.spherical.computeDistanceBetween(clocation, place.geometry.location) / 1000).toFixed(2);
+  places.push(place);
 }
 
 function addMarker(place) {
@@ -121,6 +128,9 @@ function addResult(place) {
   type = type.charAt(0).toUpperCase() + type.slice(1);
   result += '<b>Type:</b> ' + type;
   result += '<br/><b>Address:</b> ' + address + '<br/>';
+  result += '<b>Distance:</b> ' + place.distance + ' km from ';
+  if (locationGiven) result += 'your current location<br/>';
+  else result += 'City Centre<br/>';
   if (openNow)
     result += openNow;
   else
@@ -197,6 +207,8 @@ function nearYou() {
         lng: position.coords.longitude
       };
 
+      clocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+      locationGiven = true;
       infoWindow.setPosition(pos);
       infoWindow.setContent("<span style='font-weight:bold;color:#EE7600;font-size:1.5em;'>You are here.</span>");
       map.setCenter(pos);
@@ -445,6 +457,13 @@ $(document).ready(function() {
         sorted = sortByRating(sorted);
         break;
       case "proximity":
+        for (var i = 0; i < sorted.length -1 ; i++)
+          for (var j = i+1; j < sorted.length; j++)
+            if (sorted[i].distance > sorted[j].distance) {
+              var aux = sorted[i];
+              sorted[i] = sorted[j];
+              sorted[j] = aux;
+            }
         break;
       default:
         break;
