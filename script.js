@@ -78,7 +78,7 @@ function addResult(result) {
       if (place.photos)
         result += '<img class="restaurant-image" src="' + place.photos[0].getUrl({'maxWidth': 100, 'maxHeight': 100}) + '"/>';
       else
-        result += '<img class="restaurant-image" src="images/restaurant.jpg"/>';
+        result += '<img class="restaurant-image" src="images/restaurant.png"/>';
         result += '<span class="title">' + place.name + '</span><div class="rating">'+ getRating(place.rating) +'</div>';
         result += '<div class="details">';
         var address = place.formatted_address.split(', United Kingdom')[0];

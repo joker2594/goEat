@@ -167,14 +167,17 @@ body {
 
 .result {
 	position: auto;
-	padding: 7px;
+	min-height: 104px;
 	width: auto;
 	border-bottom: solid #008080 1px;
 	z-index: -1;
+	padding-top: 4px;
+	padding-right: 2px;
 }
 
 
 .title {
+	padding: 5px;
 	color: #007373;
 	font-size: 1.3em;
 	font-weight: bold;
@@ -188,7 +191,8 @@ body {
 }
 
 .details {
-	padding: 5px;
+	padding-bottom: 1px;
+	padding-left: 10px;
 	padding-top: 2px;
 	color: #595959;
 }
@@ -197,6 +201,7 @@ body {
 	float: right;
 	height: 100px;
 	width: 100px;
+	border: 1px solid #EE7600;
 }
 
 .markerlink {
