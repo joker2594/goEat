@@ -132,6 +132,14 @@ body {
 	float: right;
 }
 
+#place {
+	height: inherit;
+	width: 40%;
+	background-color: #fdfdfd;
+	z-index: 0;
+	float: right;
+}
+
 #resultsheader {
 	cursor: default;
 	width: auto;
@@ -148,16 +156,9 @@ body {
 	color: white;
 	background-color: #198c8c;
 	z-index: -1;
+	font-weight: bold;
 }
 
-
-#place {
-	height: inherit;
-	width: 50%;
-	background-color: white;
-	z-index: 0;
-	float: right;
-}
 
 #sortbox {
 	float: right;
@@ -176,6 +177,15 @@ body {
 	z-index: 1;
 }
 
+.place-details {
+
+	min-height: 104px;
+	width: auto;
+	padding-top: 4px;
+	padding-right: 2px;
+	cursor: pointer;
+	z-index: 1;
+}
 .title {
 	padding: 5px;
 	color: #007373;
@@ -184,12 +194,20 @@ body {
 }
 
 .title-placeP{
-	padding: 15px;
+	padding: 5px;
 	color: #007373;
 	font-size: 2em;
 	font-weight: bold;
 }
-
+hr { 
+   
+    margin-top: 0em;
+    margin-bottom: -1em;
+    margin-left: auto;
+    margin-right: auto;
+    border-style: inset;
+    border-width: 1px;
+}
 .rating {
 	float: right;
 	font-size: 1.2em;
@@ -199,9 +217,9 @@ body {
 
 
 .rating-placeP {
-	float: right;
+	
 	font-size: 1.8em;
-	padding-right: 5px;
+	
 	color: #EE7600;
 }
 .details {
@@ -219,9 +237,10 @@ body {
 }
 
 .restaurant-image-large {
+	position:relative;
 
-	height: 300px;
-	width: 500px;
+	height: 200px;
+	width: 400px;
 	border: 1px solid #EE7600;
 }
 .markerlink {

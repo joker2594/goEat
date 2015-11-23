@@ -283,23 +283,29 @@ function createPlaceView(place) {
   $('#placeheader').text(place.name);
 
 	//photo first
-	var result = '<div class="result">';
+	var result = '<div class="place-details">';
     	if (place.photos)
 		result += '<img class="restaurant-image-large" src="' + place.photos[0].getUrl({'maxWidth': 500, 'maxHeight': 300}) + '"/>';
 	else
 		result += '<img class="restaurant-image-large" src="images/restaurant.png"/>';
 	//name and rating
-	result += '<br> <span class="title-placeP">' + place.name + '</span><div class="rating-placeP">'+ getRating(place.rating) +'</div>';
+	result += '<br> <span class="title-placeP">' + place.name + '<hr> </span><div class="rating-placeP">'+ getRating(place.rating) +'</div>';
 	//opening hours
 	openNow = null;
-	if (place.opening_hours)
-		openNow = place.opening_hours.open_now ? '<b style="color:#EE7600;">Open now!</b>' : 'Closed now.';
+	hours = '<br><b>Opening hours: <br></b>';
+	if (place.opening_hours){
+		openNow = place.opening_hours.open_now ? '<b style="color:#EE7600;">Open now!</b>' : 'Closed now.' + '<br>'; 
+		for (i=0; i<7;i++){
+			hours+= place.opening_hours.weekday_text[i]+ '<br/>      ';
+		}
+	}
 	if (openNow)
-       		result += openNow + '<br>' +place.opening_hours;
+       		result += openNow ;
       	else
         	result += 'No info about opening hours.' + '</div></div>';
+	result
 	//details
-	result += '<div class="details">';
+	result += '<div class="details"> '+hours;
 	//address
       	var address = place.formatted_address.split(', United Kingdom')[0];
 	result+='<br/><b>Address:</b> ' + address + '<br/>';
@@ -308,7 +314,37 @@ function createPlaceView(place) {
       	if (type == 'meal_takeaway') type = 'Restaurant and takeaway';
       	type = type.charAt(0).toUpperCase() + type.slice(1);
       	result += '<b>Type:</b> ' + type;
-
+	//telephone
+	var tel=place.formatted_phone_number;
+	result+= '<br><b>Phone Number: </b>' + tel ;
+	//site
+	var site=place.website;
+	result+= '<br><b>Website: </b>' + site + '<br/>';
+	//price level
+	var priceLevel=place.price_level;
+	var formattedPriceLevel;
+	switch (priceLevel){
+		case 0:
+			formattedPriceLevel= 'Free';
+		case 1:
+			formattedPriceLevel= 'Inexpensive';
+		case 2:
+			formattedPriceLevel= 'Moderate';
+		case 3:
+			formattedPriceLevel= 'Expensive';
+		case 4:
+			formattedPriceLevel= 'Very Expensive';
+	}
+	result+= '<br><b>Price level: </b>' + formattedPriceLevel;
+	/**var reviews= place.reviews;
+	if (place.reviews){
+		result+='<br><b>reviews: </b>';
+		for (i=1; i<7; i++){
+			result+=reviews[i].aspects.author_name +'<br>'+reviews[i].aspectstext + '<br>'+reviews[i].aspects.rating+'<br>';
+		}
+	}else{
+		result+='<br>No reviews for this place.';
+	}**/
       $('#place').append(result);
 }
 

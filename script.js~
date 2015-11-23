@@ -1,17 +1,18 @@
 var map;
 var service;
 var clocation;
+var ulocation = null;
 var infoWindow;
 
-//var markers = [];
 var places = [];
 var topRatedClicked = false;
+var locationGiven = false;
 
 function initMap() {
   clocation = new google.maps.LatLng(55.863791, -4.251667);
   map = new google.maps.Map(document.getElementById('map'), {
     center: clocation,
-    zoom: 14
+    zoom: 15
   });
 
   infoWindow = new google.maps.InfoWindow();
@@ -20,37 +21,61 @@ function initMap() {
 
 function indexLoad() {
   var request = {
-    location: clocation,
-    radius: '1000',
+    bounds: map.getBounds(),
     keyword: 'restaurant',
-    maxPriceLevel: 2
+    types: ['restaurant', 'meal_takeaway'],
   };
-  service.textSearch(request, callback);
+  service.radarSearch(request, callback);
+}
+
+function sortByRating(list) {
+  var sorted = list;
+  for (var i=0; i < sorted.length -1 ; i++)
+    for (var j=i+1; j < sorted.length; j++)
+      if (sorted[i].rating<sorted[j].rating){
+        var aux = sorted[i];
+        sorted[i]=sorted[j];
+        sorted[j]=aux;
+      }
+  return sorted;
 }
 
 function callback(results, status) {
   if (status == google.maps.places.PlacesServiceStatus.OK) {
-    console.log(topRatedClicked);
-    if(topRatedClicked){
-      // Order by rating
-      for(var i=0; i < results.length -1 ; i++)
-        for (var j=i+1; j < results.length; j++)
-          if (results[i].rating<results[j].rating){
-            var aux = results[i];
-            results[i]=results[j];
-            results[j]=aux;
-          }
-    topRatedClicked = false;
+    if (topRatedClicked) {
+      results = sortByRating(results);
+      topRatedClicked = false;
     }
-    console.log(results);
     for (var i = 0; i < results.length; i++) {
       var place = results[i];
-      places.push(place);
-      addMarker(results[i]);
+      store(place);
       addResult(place);
+      addMarker(place);
     }
-    console.log(places.length);
   }
+}
+
+function callbacknear(results, status) {
+  if (status == google.maps.places.PlacesServiceStatus.OK) {
+    for (var i = 0; i < 9; i++) {
+      var place = results[i];
+      service.getDetails(place, function(result, status) {
+        if (status !== google.maps.places.PlacesServiceStatus.OK) {
+          console.error(status);
+          return;
+        }
+        store(result);
+        addResult(result);
+      });
+      addMarker(place);
+    }
+  }
+}
+
+function store(place) {
+  if (!place.rating) place.rating = 0;
+  place.distance = (google.maps.geometry.spherical.computeDistanceBetween(clocation, place.geometry.location) / 1000).toFixed(2);
+  places.push(place);
 }
 
 function addMarker(place) {
@@ -71,64 +96,57 @@ function addMarker(place) {
       return;
     }
     website = "<br/>";
+    var address = "";
+    if (result.formatted_address) address = result.formatted_address.split(', United Kingdom')[0];
     if (result.website) website = "| <a class='markerlink' href='" + result.website + "'>Visit website</a><br/>"
     infoWindow.setContent(
       "<a href='place.html&id=" + result.place_id + "' style='color:#008080;text-decoration:none;font-size:1.5em;font-weight:bold;'>" + result.name +
       "</a><br/><a class='markerlink' href='place.html?id=" + result.place_id + "'>Visit page</a> " +
-      website + result.formatted_address.split(', United Kingdom')[0]
+      website + address
     );
     infoWindow.open(map, marker);
-    //markers.push(marker);
     });
   });
 }
 
 function addResult(place) {
-  // var request = { placeId: result.place_id };
-  // service = new google.maps.places.PlacesService(map);
-  // service.getDetails(request, function(place, status) {
-  //   if (status == google.maps.places.PlacesServiceStatus.OK) {
-      openNow = null;
-      if (place.opening_hours)
-        openNow = place.opening_hours.open_now ? '<b style="color:#EE7600;">Open now!</b>' : 'Closed.';
-      var result = '<div class="result">';
-      if (place.photos)
-        result += '<img class="restaurant-image" src="' + place.photos[0].getUrl({'maxWidth': 100, 'maxHeight': 100}) + '"/>';
-      else
-        result += '<img class="restaurant-image" src="images/restaurant.png"/>';
-      result += '<span class="title">' + place.name + '</span><div class="rating">'+ getRating(place.rating) +'</div>';
-      result += '<div class="details">';
-      var address = place.formatted_address.split(', United Kingdom')[0];
-      var type = place.types[0];
-      if (type == 'meal_takeaway') type = 'Restaurant and takeaway';
-      type = type.charAt(0).toUpperCase() + type.slice(1);
-      result += '<b>Type:</b> ' + type;
-      result += '<br/><b>Address:</b> ' + address + '<br/>';
-      if (openNow)
-        result += openNow;
-      else
-        result += 'No info about opening hours.' + '</div></div>';
-      $('#results').append(result);
-  //   } else {
-  //     console.log('no');
-  //   }
-  // });
+  openNow = null;
+  if (place.opening_hours)
+    openNow = place.opening_hours.open_now ? '<b style="color:#EE7600;">Open now!</b>' : 'Closed.';
+  var result = '<div class="result" data-id=' + place.place_id + '>';
+  if (place.photos)
+    result += '<img class="restaurant-image" src="' + place.photos[0].getUrl({'maxWidth': 100, 'maxHeight': 100}) + '"/>';
+  else
+    result += '<img class="restaurant-image" src="images/restaurant.png"/>';
+  result += '<span class="title">' + place.name + '</span><div class="rating">'+ getRating(place.rating) +'</div>';
+  result += '<div class="details">';
+  var address = "";
+  if (place.formatted_address) address = place.formatted_address.split(', United Kingdom')[0];
+  var type = "";
+  if (place.types) type = place.types[0];
+  if (type == 'meal_takeaway') type = 'Restaurant and takeaway';
+  type = type.charAt(0).toUpperCase() + type.slice(1);
+  result += '<b>Type:</b> ' + type;
+  result += '<br/><b>Address:</b> ' + address + '<br/>';
+  result += '<b>Distance:</b> ' + place.distance + ' km from ';
+  if (locationGiven) result += 'your current location<br/>';
+  else result += 'City Centre<br/>';
+  if (openNow)
+    result += openNow;
+  else
+    result += 'No info about opening hours.' + '</div></div>';
+  $('#results').append(result);
 }
 
 function getRating(rating) {
   // round rating
   var rate = Math.round(rating);
   var stars = "";
+  if (rate == 0) return stars;
   for (var i = 0; i < rate; i++) stars += "★";
   for (var i = rate; i < 5; i++) stars += "☆";
   return stars;
 }
-
-// function clearMarkers() {
-//   for (var i = 0; i < markers.length; i++) {
-//     markers[i].setMap(null);
-//   }
-// }
 
 function searchQuery(query) {
   //clearMarkers();
@@ -140,7 +158,8 @@ function searchQuery(query) {
 
   var request = {
     bounds: map.getBounds(),
-    query: query + ' restaurant',
+    query: query,
+    types: ['restaurant', 'meal_takeaway'],
   }
   service.textSearch(request, callback);
 }
@@ -188,6 +207,8 @@ function nearYou() {
         lng: position.coords.longitude
       };
 
+      clocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+      locationGiven = true;
       infoWindow.setPosition(pos);
       infoWindow.setContent("<span style='font-weight:bold;color:#EE7600;font-size:1.5em;'>You are here.</span>");
       map.setCenter(pos);
@@ -208,12 +229,12 @@ function nearYou() {
 
       $('#results-for').text("Near You");
 
-      var newrequest = {
-        query: 'restaurant',
+      var request = {
+        types: ['restaurant', 'meal_takeaway'],
         location: pos,
-        radius: 1000
+        radius: 500,
       };
-      service.textSearch(newrequest, callback);
+      service.radarSearch(request, callbacknear);
     }, function() {
       handleLocationError(true, infoWindow, map.getCenter());
     });
@@ -262,23 +283,29 @@ function createPlaceView(place) {
   $('#placeheader').text(place.name);
 
 	//photo first
-	var result = '<div class="result">';
+	var result = '<div class="place-details">';
     	if (place.photos)
 		result += '<img class="restaurant-image-large" src="' + place.photos[0].getUrl({'maxWidth': 500, 'maxHeight': 300}) + '"/>';
 	else
 		result += '<img class="restaurant-image-large" src="images/restaurant.png"/>';
-	//name and rating 
-	result += '<span class="title-placeP">' + place.name + '</span><div class="rating-placeP">'+ getRating(place.rating) +'</div>';
+	//name and rating
+	result += '<br> <span class="title-placeP">' + place.name + '<hr> </span><div class="rating-placeP">'+ getRating(place.rating) +'</div>';
 	//opening hours
 	openNow = null;
-	if (place.opening_hours)
-		openNow = place.opening_hours.open_now ? '<b style="color:#EE7600;">Open now!</b>' : 'Closed now.';
+	hours = '<br><b>Opening hours: <br></b>';
+	if (place.opening_hours){
+		openNow = place.opening_hours.open_now ? '<b style="color:#EE7600;">Open now!</b>' : 'Closed now.' + '<br>'; 
+		for (i=0; i<7;i++){
+			hours+= place.opening_hours.weekday_text[i]+ '<br/>      ';
+		}
+	}
 	if (openNow)
-       		result += openNow + '<br>' +place.opening_hours;
+       		result += openNow ;
       	else
         	result += 'No info about opening hours.' + '</div></div>';
+	result
 	//details
-	result += '<div class="details">';
+	result += '<div class="details"> '+hours;
 	//address
       	var address = place.formatted_address.split(', United Kingdom')[0];
 	result+='<br/><b>Address:</b> ' + address + '<br/>';
@@ -287,8 +314,45 @@ function createPlaceView(place) {
       	if (type == 'meal_takeaway') type = 'Restaurant and takeaway';
       	type = type.charAt(0).toUpperCase() + type.slice(1);
       	result += '<b>Type:</b> ' + type;
-
+	//telephone
+	var tel=place.formatted_phone_number;
+	result+= '<br><b>Phone Number: </b>' + tel ;
+	//site
+	var site=place.website;
+	result+= '<br><b>Website: </b>' + site + '<br/>';
+	//price level
+	var priceLevel=place.price_level;
+	var formattedPriceLevel;
+	switch (priceLevel){
+		case 0:
+			formattedPriceLevel= 'Free';
+		case 1:
+			formattedPriceLevel= 'Inexpensive';
+		case 2:
+			formattedPriceLevel= 'Moderate';
+		case 3:
+			formattedPriceLevel= 'Expensive';
+		case 4:
+			formattedPriceLevel= 'Very Expensive';
+	}
+	result+= '<br><b>Price level: </b>' + formattedPriceLevel;
+	var reviews= place.reviews;
+	if (place.reviews){
+		result+='<br><b>reviews: </b>';
+		for (i=1; i<7; i++){
+			result+=reviews[i].aspects.author_name +'<br>'+reviews[i].aspectstext + '<br>'+reviews[i].aspects.rating+'<br>';
+		}
+	}else{
+		result+='<br>No reviews for this place.';
+	}
       $('#place').append(result);
+}
+
+function showResults(places) {
+  for (var i = 0; i < places.length; i++) {
+    var place = places[i];
+    addResult(place);
+  }
 }
 
 $(document).ready(function() {
@@ -303,6 +367,9 @@ $(document).ready(function() {
   var searchtoggle = false;
 
   $(window).load(function() {
+    // check if at index
+    var page = document.URL.split('goEat/')[1];
+    if (page == 'index.html') return indexLoad();
     var bool = true;
     var query = location.search.split('query=')[1];
     if (searches.length >= 5) {
@@ -321,16 +388,16 @@ $(document).ready(function() {
         var filter = location.search.split('filter=')[1];
         if (filter == undefined) {
           initMap();
-          searchQuery('restaurant');
+          searchQuery("restaurant");
         } else {
           if (filter == "near") nearYou();
           if (filter == "popular") {
-            searchQuery("");
+            searchQuery("restaurant");
             $('#results-for').text("Most Popular");
           }
           if (filter == "toprated") {
             topRatedClicked = true;
-            searchQuery("");
+            searchQuery("restaurant");
             $('#results-for').text("Top Rated");
           }
         }
@@ -357,13 +424,6 @@ $(document).ready(function() {
     }
   });
 
- //  $(window).load(function(){
- //    var place = location.search.split("&")[0].replace("?","").split("=")[1]
- //    searchQuery('restaurant');
- //    if (place != undefined) addPlace(place);
- //
- // });
-
   $('#sidebaricon').hover(function() {
     $(this).css("background-image", "url('images/sidebarselected.png')");
   },
@@ -371,23 +431,85 @@ $(document).ready(function() {
     $(this).css("background-image", "url('images/sidebar.png')");
   });
 
+  $('.result').hover(function() {
+    $(this).css("background-color", "blue");
+  },
+  function() {
+    $(this).css("background-color", "black");
+  });
+
   $(document).on("mouseenter", ".filter", function() {
     $(this).css("background-color", "#f19132");
     $(this).css("color", "#ffffff");
   });
 
-  $(document).on("mouseout", ".filter", function() {
+  $(document).on("mouseleave", ".filter", function() {
     $(this).css("background-color", "#ffffff");
     $(this).css("color", "#000000");
   });
 
   $(document).on("mouseenter", ".result", function() {
-    $(this).css("background-color", "#f19132");
+    $(this).css("background-color", "#eeeeee");
   });
 
-  $(document).on("mouseout", ".result", function() {
-    $(this).css("background-color", "#ffffff");
+  $(document).on("mouseleave", ".result", function() {
+    $(this).css("background-color", "#fdfdfd");
   });
+
+  $(document).on("click", ".result", function() {
+    $(this).css("background-color", "#f39f4c");
+    var id = $(this).data('id');
+    window.location.replace('place.html?id=' + id);
+  });
+
+  $(document).on("mouseenter", ".sortoption", function() {
+    $(this).css("background-color", "#f19132");
+    $(this).css("color", "#ffffff");
+  });
+
+  $(document).on("mouseleave", ".sortoption", function() {
+    $(this).css("background-color", "#ffffff");
+    $(this).css("color", "#000000");
+  });
+
+  $(document).on("click", ".sortoption", function() {
+    var option = $(this).data('option');
+    // hide results
+    $('.result').each(function () {
+      $(this).remove();
+    });
+    var sorted = places.slice();
+    switch (option) {
+      case "name":
+        for (var i = 0; i < sorted.length -1 ; i++)
+          for (var j = i+1; j < sorted.length; j++)
+            if (sorted[i].name > sorted[j].name) {
+              var aux = sorted[i];
+              sorted[i] = sorted[j];
+              sorted[j] = aux;
+            }
+        break;
+      case "rating":
+        sorted = sortByRating(sorted);
+        break;
+      case "proximity":
+        for (var i = 0; i < sorted.length -1 ; i++)
+          for (var j = i+1; j < sorted.length; j++)
+            if (sorted[i].distance > sorted[j].distance) {
+              var aux = sorted[i];
+              sorted[i] = sorted[j];
+              sorted[j] = aux;
+            }
+        break;
+      default:
+        break;
+    }
+    showResults(sorted);
+    $('#sortbar').css("display", "none");
+    $('#sortbox > img').attr("src", "images/expand.png");
+    sortbar = false;
+  });
+
   $('#sidebaricon').click(function() {
     if (sidebar) $('#sidebar').css("display", "none");
     else $('#sidebar').css("display", "table");
