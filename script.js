@@ -379,7 +379,7 @@ $(document).ready(function() {
     if (page == 'index.html') return indexLoad();
     var bool = true;
     var query = location.search.split('query=')[1];
-	query=decodeURI(query);
+
     if (searches.length >= 5) {
       searches.splice(0, 1);
     }
@@ -411,6 +411,7 @@ $(document).ready(function() {
         }
       }
     } else {
+      query=decodeURI(query);
       searches.push(query);
       //var json_str = JSON.stringify(searches);
       //createCookie('mycookie', json_str);
