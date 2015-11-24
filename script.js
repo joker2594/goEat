@@ -1,7 +1,6 @@
 var map;
 var service;
 var clocation;
-var ulocation = null;
 var infoWindow;
 
 var places = [];
@@ -18,13 +17,10 @@ function initMap() {
   infoWindow = new google.maps.InfoWindow();
   service = new google.maps.places.PlacesService(map);
 }
-  
 
-  
 function indexLoad() {
   var request = {
     bounds: map.getBounds(),
-    keyword: 'restaurant',
     types: ['restaurant', 'meal_takeaway'],
   };
   service.radarSearch(request, callback);
@@ -90,7 +86,6 @@ function addMarker(place) {
       scaledSize: new google.maps.Size(15, 25)
     }
   });
-
   google.maps.event.addListener(marker, 'click', function() {
   service.getDetails(place, function(result, status) {
     if (status !== google.maps.places.PlacesServiceStatus.OK) {
@@ -167,32 +162,38 @@ function searchQuery(query) {
   service.textSearch(request, callback);
 }
 
-var createCookie = function(name, value, days) {
-    var expires;
-    if (days) {
-        var date = new Date();
-        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-        expires = "; expires=" + date.toGMTString();
-    }
-    else {
-        expires = "";
-    }
-    document.cookie = name + "=" + value + expires + "; path=/";
-}
-
-function getCookie(c_name) {
-    if (document.cookie.length > 0) {
-        c_start = document.cookie.indexOf(c_name + "=");
-        if (c_start != -1) {
-            c_start = c_start + c_name.length + 1;
-            c_end = document.cookie.indexOf(";", c_start);
-            if (c_end == -1) {
-                c_end = document.cookie.length;
-            }
-            return unescape(document.cookie.substring(c_start, c_end));
+function setLocation() {
+  infoWindow = new google.maps.InfoWindow({map: map});
+  // Try HTML5 geolocation.
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+      var pos = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+      };
+      // put location in cookies
+      locationGiven = true;
+      $.cookie('lat', escape(pos.lat), {expires:1234});
+      $.cookie('lng', escape(pos.lng), {expires:1234});
+      infoWindow.setPosition(pos);
+      infoWindow.setContent("<span style='font-weight:bold;color:#EE7600;font-size:1.5em;'>You are here.</span>");
+      var marker = new google.maps.Marker({
+        map: map,
+        position: pos,
+        icon: {
+          url: 'images/home.png',
+          anchor: new google.maps.Point(10, 10),
+          scaledSize: new google.maps.Size(15, 25)
         }
-    }
-    return "";
+      });
+      google.maps.event.addListener(marker, 'click', function() {
+        infoWindow.setContent("<span style='font-weight:bold;color:#EE7600;font-size:1.5em;'>You are here.</span>");
+        infoWindow.open(map, marker);
+      });
+    }, function() {
+      //handleLocationError(true, infoWindow, map.getCenter());
+    });
+  }
 }
 
 function nearYou() {
@@ -297,7 +298,7 @@ function createPlaceView(place) {
 	openNow = null;
 	hours = '<br><b>Opening hours: <br></b>';
 	if (place.opening_hours){
-		openNow = place.opening_hours.open_now ? '<b style="color:#EE7600;">Open now!</b>' : 'Closed now.' + '<br>'; 
+		openNow = place.opening_hours.open_now ? '<b style="color:#EE7600;">Open now!</b>' : 'Closed now.' + '<br>';
 		for (i=0; i<7;i++){
 			hours+= place.opening_hours.weekday_text[i]+ '<br/>      ';
 		}
@@ -315,6 +316,7 @@ function createPlaceView(place) {
 	//type
       	var type = place.types[0];
       	if (type == 'meal_takeaway') type = 'Restaurant and takeaway';
+        if (type == 'night_club') type = "Night club";
       	type = type.charAt(0).toUpperCase() + type.slice(1);
       	result += '<b>Type:</b> ' + type;
 	//telephone
@@ -365,15 +367,13 @@ function showResults(places) {
 }
 
 $(document).ready(function() {
-  var cookie=unescape($.cookie('history'))
-  var history=cookie.split(',')
-  console.log(history);
-	
+  var cookie=unescape($.cookie('history'));
+  var history=cookie.split(',');
+
   var sidebar = false;
   var sortbar = false;
 
   var cuisines = ['Chinese', 'Japanese', 'Italian', 'Greek', 'Indian'];
-  var searches = [];
 
   var filtertoggle = true;
   var cuisinetoggle = false;
@@ -386,9 +386,6 @@ $(document).ready(function() {
     var bool = true;
     var query = location.search.split('query=')[1];
 
-    if (searches.length >= 5) {
-      searches.splice(0, 1);
-    }
     if (query !=undefined)
       $('#search').val(decodeURI(query));
     if (query == undefined) {
@@ -418,12 +415,8 @@ $(document).ready(function() {
         }
       }
     } else {
-      query = decodeURI(query);
-      searches.push(query);
-      //var json_str = JSON.stringify(searches);
-      //createCookie('mycookie', json_str);
-      updateRecentSearches();
-      initMap();
+      initMap()
+      query = decodeURI(query);;
       searchQuery(query);
     }
   });
@@ -434,6 +427,11 @@ $(document).ready(function() {
     }
   });
 
+  $('.headericon').hover(function() {
+    $(this).css("background-color", "#BE5E00");
+  }, function() {
+    $(this).css("background-color", "");
+  });
 
   $('#sidebaricon').hover(function() {
     $(this).css("background-image", "url('images/sidebarselected.png')");
@@ -567,19 +565,6 @@ $(document).ready(function() {
   });
 
 
-  function updateRecentSearches() {
-    //var json_str = getCookie('mycookie');
-    //var searches = JSON.parse(json_str);
-    /**$(window).load(function() {
-	 var bound = history.length > 5 ? 5 : history.length;
-    for (i = 0; i < bound; i++) {
-	  if (history[i] !== "undefined" ){
-		  $('#searchhistory').append('<div class="filter filter-cuisine" data-cuisineitem="' + history[i] + '">' + history[i] + '</div>');
-	  }
-    }
-  });*/
-  }
-
   $(document).on('click', '.filter-search', function () {
     var query = $(this).text();
     $('#search').val(query);
@@ -593,9 +578,7 @@ $(document).ready(function() {
 		   var query = $(this).val();
 			history.push(query);
 			$.cookie('history', escape(history.join(',')), {expires:1234});
-			console.log("hi");
 			window.location.replace('results.html?query=' + query);
-			updateRecentSearches();
 	   }
    });
 
@@ -607,13 +590,12 @@ $(document).ready(function() {
   $(window).load(function() {
 	 var bound = history.length > 5 ? 5 : history.length;
     for (i = 0; i < bound; i++) {
-		console.log(history[0]);
-		console.log(history[1]);
 	  if (history[i] !== "undefined" ){
 		  $('#searchhistory').append('<div class="filter filter-cuisine" data-cuisineitem="' + history[ history.length-i] + '">' + history[history.length-i] + '</div>');
 	  }
     }
   });
+
   $('#sortbox').click(function() {
     if (sortbar) {
       $('#sortbar').css("display", "none");
@@ -624,5 +606,9 @@ $(document).ready(function() {
       $('#sortbox > img').attr("src", "images/shrink.png");
     }
     sortbar = !sortbar;
+  });
+
+  $('#location').click(function() {
+    setLocation();
   });
 });

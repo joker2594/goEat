@@ -20,6 +20,24 @@ body {
   z-index: 2;
 }
 
+#location {
+	float: right;
+	height: 3em;
+	width: 3em;
+	background-image: url('images/location.png');
+	background-size: cover;
+	cursor: pointer;
+}
+
+#usericon {
+	float: right;
+	height: 3em;
+	width: 3em;
+	background-image: url('images/user.png');
+	background-size: cover;
+	cursor: pointer;
+}
+
 #sidebaricon {
   height: 3em;
   width: 3em;
@@ -168,7 +186,6 @@ body {
 }
 
 .result {
-	position: auto;
 	width: auto;
 	border-bottom: solid #008080 1px;
 	padding-top: 4px;
