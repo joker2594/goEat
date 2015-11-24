@@ -142,7 +142,8 @@ body {
 
 #resultsheader {
 	cursor: default;
-	width: auto;
+	position: fixed;
+	width: 35%;
 	padding: 1em;
 	color: white;
 	background-color: #198c8c;
@@ -161,15 +162,13 @@ body {
 
 
 #sortbox {
-	
 	float: right;
-	padding-bottom: 10px;
 	cursor: pointer;
+	margin-right: 2em;
 }
 
 .result {
 	position: auto;
-	height: 110px !important;
 	width: auto;
 	border-bottom: solid #008080 1px;
 	padding-top: 4px;
@@ -179,7 +178,6 @@ body {
 }
 
 .place-details {
-
 	min-height: 104px;
 	width: auto;
 	padding-top: 4px;
@@ -187,6 +185,7 @@ body {
 	cursor: pointer;
 	z-index: 1;
 }
+
 .title {
 	padding: 5px;
 	color: #007373;
@@ -200,8 +199,8 @@ body {
 	font-size: 2em;
 	font-weight: bold;
 }
-hr { 
-   
+
+hr {
     margin-top: 0em;
     margin-bottom: -1em;
     margin-left: auto;
@@ -210,10 +209,12 @@ hr {
     border-width: 1px;
     border-color: #008080;
 }
-.reviews-title{
+
+.reviews-title {
    font-size:1.3em;
    font-weight: bold;
 }
+
 .rating {
 	float: right;
 	font-size: 1.2em;
@@ -221,13 +222,11 @@ hr {
 	color: #EE7600;
 }
 
-
 .rating-placeP {
-	
 	font-size: 1.8em;
-	
 	color: #EE7600;
 }
+
 .details {
 	padding-bottom: 1px;
 	padding-left: 10px;
@@ -244,11 +243,11 @@ hr {
 
 .restaurant-image-large {
 	position:relative;
-
 	height: 200px;
 	width: 400px;
 	border: 1px solid #EE7600;
 }
+
 .markerlink {
 	text-decoration: none;
 	color: #198c8c;
@@ -256,21 +255,22 @@ hr {
 
 #sortbar {
 	position:fixed;
-	margin-left:450px;
 	height: auto;
-	float: right;
 	width: inherit;
 	display: none;
 	z-index: 1;
 	cursor: pointer;
 }
 
+#sortwrapper {
+	float: right;
+	width: 7em;
+	margin-right: 2em;
+}
+
 .sortoption {
-	
-	width: 7em;;
+	width: 7em;
 	padding: 1em;
-	margin-left: 4em;
-	font-size: 1em;
 	background-color: white;
 	vertical-align: middle;
 	border: 1px solid #008080;
