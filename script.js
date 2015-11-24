@@ -383,7 +383,8 @@ $(document).ready(function() {
     if (searches.length >= 5) {
       searches.splice(0, 1);
     }
-    $('#search').val(query);
+    if (query !=undefined)
+      $('#search').val(decodeURI(query));
     if (query == undefined) {
       var id = location.search.split('id=')[1];
       if (id != undefined) {
@@ -411,7 +412,7 @@ $(document).ready(function() {
         }
       }
     } else {
-      query=decodeURI(query);
+      query = decodeURI(query);
       searches.push(query);
       //var json_str = JSON.stringify(searches);
       //createCookie('mycookie', json_str);
