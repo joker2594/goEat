@@ -1,6 +1,7 @@
 var map;
 var service;
 var clocation;
+var ulocation;
 var infoWindow;
 
 var places = [];
@@ -47,6 +48,10 @@ function callback(results, status) {
     for (var i = 0; i < results.length; i++) {
       var place = results[i];
       store(place);
+      if (locationGiven) {
+        infoWindow = new google.maps.InfoWindow();
+        addHomeMarker(infoWindow, ulocation);
+      }
       addResult(place);
       addMarker(place);
     }
@@ -72,7 +77,7 @@ function callbacknear(results, status) {
 
 function store(place) {
   if (!place.rating) place.rating = 0;
-  place.distance = (google.maps.geometry.spherical.computeDistanceBetween(clocation, place.geometry.location) / 1000).toFixed(2);
+  place.distance = (google.maps.geometry.spherical.computeDistanceBetween(ulocation, place.geometry.location) / 1000).toFixed(2);
   places.push(place);
 }
 
@@ -175,31 +180,35 @@ function setLocation() {
       locationGiven = true;
       $.cookie('lat', escape(pos.lat), {expires:1234});
       $.cookie('lng', escape(pos.lng), {expires:1234});
-      infoWindow.setPosition(pos);
-      infoWindow.setContent("<span style='font-weight:bold;color:#EE7600;font-size:1.5em;'>You are here.</span>");
-      var marker = new google.maps.Marker({
-        map: map,
-        position: pos,
-        icon: {
-          url: 'images/home.png',
-          anchor: new google.maps.Point(10, 10),
-          scaledSize: new google.maps.Size(15, 25)
-        }
-      });
-      google.maps.event.addListener(marker, 'click', function() {
-        infoWindow.setContent("<span style='font-weight:bold;color:#EE7600;font-size:1.5em;'>You are here.</span>");
-        infoWindow.open(map, marker);
-      });
+      addHomeMarker(infoWindow, pos);
     }, function() {
       //handleLocationError(true, infoWindow, map.getCenter());
     });
   }
 }
 
+function addHomeMarker(infoWindow, pos) {
+  infoWindow.setPosition(pos);
+  infoWindow.setContent("<span style='font-weight:bold;color:#EE7600;font-size:1.5em;'>You are here.</span>");
+  var marker = new google.maps.Marker({
+    map: map,
+    position: pos,
+    icon: {
+      url: 'images/home.png',
+      anchor: new google.maps.Point(10, 10),
+      scaledSize: new google.maps.Size(15, 25)
+    }
+  });
+  google.maps.event.addListener(marker, 'click', function() {
+    infoWindow.setContent("<span style='font-weight:bold;color:#EE7600;font-size:1.5em;'>You are here.</span>");
+    infoWindow.open(map, marker);
+  });
+}
+
 function nearYou() {
   map = new google.maps.Map(document.getElementById('map'), {
     center: clocation,
-    zoom: 16,
+    zoom: 15,
   });
   infoWindow = new google.maps.InfoWindow({map: map});
 
@@ -379,7 +388,20 @@ $(document).ready(function() {
   var cuisinetoggle = false;
   var searchtoggle = false;
 
+  var lat;
+  var lng;
+
   $(window).load(function() {
+    lat = unescape($.cookie('lat'));
+    lng = unescape($.cookie('lng'));
+    if (lat != 'undefined') {
+      ulocation = new google.maps.LatLng(parseFloat(lat), parseFloat(lng));
+      locationGiven = true;
+    } else {
+      ulocation = new google.maps.LatLng(55.863791, -4.251667);
+      locationGiven = false;
+    }
+
     // check if at index
     var page = document.URL.split('goEat/')[1];
     if (page == 'index.html') return indexLoad();
