@@ -10,6 +10,7 @@
   <body>
     <script src="jquery.js"></script>
     <script src="script.js"></script>
+    <script src="login.js"></script>
     <script async defer
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBFSaTpf802VTdXvM19FJpnp_5IvPt2kuo&callback=initMap&libraries=places,geometry">
     </script>
@@ -19,7 +20,10 @@
       <div id="header">
         <div id="sidebaricon"></div>
         <div onclick="location.href='index.html'" id="logo">goEat</div>
+        <div onclick="location.href='register.html'" id="logo">Register</div>
+        <div onclick="location.href='login.html'" id="logo">Login</div>
         <div id="searchbox"><input id="search" type="text" placeholder="Search for dishes or restaurants..." /></div>
+	<p id="userpanel"></p>
       </div>
 
       <!-- SIDEBAR -->
