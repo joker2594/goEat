@@ -319,32 +319,38 @@ function createPlaceView(place) {
 	result+= '<br><b>Phone Number: </b>' + tel ;
 	//site
 	var site=place.website;
-	result+= '<br><b>Website: </b>' + site + '<br/>';
+	result+= '<br><b>Website: </b> <a href="'+ site + '">Visit '+place.name+'</a><br/>';
 	//price level
 	var priceLevel=place.price_level;
 	var formattedPriceLevel;
-	switch (priceLevel){
-		case 0:
-			formattedPriceLevel= 'Free';
-		case 1:
-			formattedPriceLevel= 'Inexpensive';
-		case 2:
-			formattedPriceLevel= 'Moderate';
-		case 3:
-			formattedPriceLevel= 'Expensive';
-		case 4:
-			formattedPriceLevel= 'Very Expensive';
-	}
-	result+= '<br><b>Price level: </b>' + formattedPriceLevel;
-	/**var reviews= place.reviews;
+
+	if (priceLevel==0){
+		formattedPriceLevel= 'Free';
+	}else if (priceLevel==1){
+		formattedPriceLevel= 'Inexpensive';
+	}else if (priceLevel==2){
+		formattedPriceLevel= 'Moderate';
+	}else if (priceLevel==3){
+		formattedPriceLevel= 'Expensive';
+	}else if (priceLevel==4){
+		formattedPriceLevel= 'Very Expensive';
+	}else formattedPriceLevel= 'No details about pricing';
+
+	result+= '<br><b>Price level: </b>' + formattedPriceLevel +'<br>' ;
+	var i=0;
 	if (place.reviews){
-		result+='<br><b>reviews: </b>';
-		for (i=1; i<7; i++){
-			result+=reviews[i].aspects.author_name +'<br>'+reviews[i].aspectstext + '<br>'+reviews[i].aspects.rating+'<br>';
-		}
+		result+='<br> <hr><br><div class="reviews-title"> Reviews: </b> </div>';
+		result+='<hr> <br>';
+		var reviews= place.reviews;
+		$.each(reviews, function(key, value){
+			if (i<6){
+				result+='<b>'+ value.author_name+ '</b>' +'<br>'+value.text + '<br> Rating: '+value.rating+'<br><br>';
+			}
+			i++;
+		})
 	}else{
 		result+='<br>No reviews for this place.';
-	}**/
+	}
       $('#place').append(result);
 }
 
