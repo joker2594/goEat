@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+      <link rel="stylesheet" href="style.css"/>
+      <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'/>
+      <link rel="icon" type="image/png" href="images/icon.png"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>goEat Login</title>
+<style>
+*{
+	margin:0px;
+	padding:0px;
+	}
+body{
+	font-family:Tahoma, Geneva, sans-serif;
+	}
+#container{
+	width:550px;
+	background-color:rgba(250,250,252,.9);
+	margin:auto;
+	margin-top:10px;
+	margin-bottom:10px;
+	box-shadow:0 0 3px #999;
+	}
+#container_body{
+	padding:20px;
+	}
+.form_title{
+	font-size:35px;
+	color:#141823;
+	text-align:center;
+	padding:10px;
+	font-weight:normal;
+	}
+.head_para{
+	font-size:19px;
+	color:#99a2a7;
+	text-align:center;
+	font-weight:normal;
+	}
+#form_name{
+	padding:15px 0 10px 0px;
+	}
+.firstnameorlastname{
+	 margin-right:20px;
+	}
+.input_name{
+	width:434px;
+	padding:5px;
+	font-size:18px;
+	}
+#email_form{
+	clear:both;
+	padding:15px 0 10px 0px;
+	}
+.input_email{
+	width:434px;
+	padding:5px;
+	font-size:18px;
+	}
+#Re_email_form{
+	padding:10px 0 10px 0px;
+	}
+.input_Re_email{
+	width:434px;
+	padding:5px;
+	font-size:18px;
+	}
+#password_form{
+	padding:10px 0 10px 0px;
+	}
+.input_password{
+	width:434px;
+	padding:5px;
+	font-size:18px;
+	}
+.birthday_title{
+	font-size:16px; 
+	color:#8b919d; 
+	font-weight:normal;
+	padding:0 0 10px 0;
+	}
+select{
+	padding:5px;
+	}
+#birthday{
+	font-size:12px;
+	color:#8b919d;
+	padding-top:10px;
+	}
+#radio_button{
+	padding:10px 0 0 0;
+	}
+#sign_user{
+	font-size:14px;
+	color:#FFF;
+	text-align:center;
+	background-color: #EE7600;
+	padding:10px;
+	margin-top:10px;
+	cursor: pointer;
+	}
+#errorBox{
+	color:#F00;
+	}
+
+
+
+</style>
+<script>
+function Submit(){
+	var emailRegex = /^[A-Za-z0-9._]*\@[A-Za-z]*\.[A-Za-z]{2,5}$/;
+	var fname = document.form.Name.value,
+		lname = document.form.LastName.value,
+		femail = document.form.Email.value,
+		freemail = document.form.enterEmail.value,
+		fpassword = document.form.Password.value,
+		fmonth = document.form.birthday_month.value,
+		fday = document.form.birthday_day.value,
+		fyear = document.form.birthday_year.value;
+		
+	if( fname == "" )
+   {
+     document.form.Name.focus() ;
+	 document.getElementById("errorBox").innerHTML = "enter the first name";
+     return false;
+   }
+	if( lname == "" )
+   {
+     document.form.LastName.focus() ;
+	  document.getElementById("errorBox").innerHTML = "enter the last name";
+     return false;
+   }
+   
+   if (femail == "" )
+	{
+		document.form.Email.focus();
+		document.getElementById("errorBox").innerHTML = "enter the email";
+		return false;
+	 }else if(!emailRegex.test(femail)){
+		document.form.Email.focus();
+		document.getElementById("errorBox").innerHTML = "enter the valid email";
+		return false;
+	 }
+	 
+	  if (freemail == "" )
+	{
+		document.form.enterEmail.focus();
+		document.getElementById("errorBox").innerHTML = "Re-enter the email";
+		return false;
+	 }else if(!emailRegex.test(freemail)){
+		document.form.enterEmail.focus();
+		document.getElementById("errorBox").innerHTML = "Re-enter the valid email";
+		return false;
+	 }
+	 
+	 if(freemail !=  femail){
+		 document.form.enterEmail.focus();
+		 document.getElementById("errorBox").innerHTML = "emails are not matching, re-enter again";
+		 return false;
+		 }
+	 
+	 
+	if(fpassword == "")
+	 {
+		 document.form.Password.focus();
+		 document.getElementById("errorBox").innerHTML = "enter the password";
+		 return false;
+	 }
+	 
+		 if (fmonth == "") {
+        document.form.birthday_month.focus();
+		document.getElementById("errorBox").innerHTML = "select the birthday month";
+        return false;
+     }
+	 if (fday == "") {
+        document.form.birthday_day.focus();
+		document.getElementById("errorBox").innerHTML = "select the birthday day";
+        return false;
+     }
+	 if (fyear == "") {
+        document.form.birthday_year.focus();
+		document.getElementById("errorBox").innerHTML = "select the birthday year";
+        return false;
+     }
+		if(document.form.radiobutton[0].checked == false && document.form.radiobutton[1].checked == false){
+				document.getElementById("errorBox").innerHTML = "select your gender";
+			 return false;
+			}
+		if(fname != '' && lname != '' && femail != '' && freemail != '' && fpassword != '' && fmonth != '' && fday != '' && fyear != ''){
+			document.getElementById("errorBox").innerHTML = "form submitted successfully";
+			}
+		  
+}
+
+</script>
+      <title>goEat</title>
+  </head>
+  <body>
+    <script src="jquery.js"></script>
+    <script src="script.js"></script>
+    <script async defer
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBFSaTpf802VTdXvM19FJpnp_5IvPt2kuo&callback=initMap&libraries=places,geometry">
+    </script>
+    <div id="wrapper">
+
+      <!-- HEADER  -->
+      <div id="header">
+        <div id="sidebaricon"></div>
+        <div onclick="location.href='index.html'" id="logo">goEat</div>
+        <div onclick="location.href='register.html'" id="logo">Register</div>
+        <div onclick="location.href='login.html'" id="logo">Login</div>
+        <div id="searchbox"><input id="search" type="text" placeholder="Search for dishes or restaurants..." /></div>
+      </div>
+
+      <!-- SIDEBAR -->
+      <div id="sidebar"><div style="height: 3em;"></div>
+        <div id="filtertoggle" class="category">Filter<img class="catshrink" src='images/shrink.png'/></div>
+        <div id="filters">
+          <div id="popular" class="filter">Most popular</div>
+          <div class="filter">Top rated</div>
+          <div id="nearyou" class="filter">Near you</div>
+        </div>
+        <div id="cuisinetoggle" class="category">Cuisine<img class="catexpand" src='images/expand.png'/></div><div id="cats"></div>
+        <div id="searchtoggle" class="category">Recent Searches<img class="catexpand" src='images/expand.png'/></div><div id="searchhistory"></div>
+      </div>
+
+      <!-- MAP -->
+      <div class="genwrapper"><div id="map"></div></div>
+    </div>
+<div id="emptyDiv">
+<h2><a href="http://www.webcodehelpers.com" target="_blank">WebCodeHelpers.com</a></h2>
+Tutorial Link : <a href=" http://www.webcodehelpers.com/2013/11/registration-form-validation-using-javascript-with-example.html" target="_blank">http://www.webcodehelpers.com/2013/11/registration-form-validation-using-javascript-with-example.html</a>
+</div>
+<div id="description"></div>
+<!--container start-->
+<div id="container">
+  <div id="container_body">
+    <div>
+      <h2 class="form_title">User Login</h2>
+      <p class="head_para"></p>
+    </div>
+    <!--Form  start-->
+    <div id="form_name">
+       <form name="form" >
+        <input type="text" name="Name" value="" placeholder="Username"  class="input_name" >
+      </div>
+      <div id="password_form">
+        <input type="password" name="Password" value=""  placeholder="New Password" class="input_password">
+      </div>
+      <!--birthday details start-->
+      
+       <div>
+        <p id="sign_user" onClick="Submit()">Log in </p>
+      </div>
+     </form>
+    </div>
+    <!--form ends--> 
+  </div>
+</div>
+<!--container ends-->
+  </body>
+</html>
