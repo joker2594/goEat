@@ -18,7 +18,9 @@ function initMap() {
   infoWindow = new google.maps.InfoWindow();
   service = new google.maps.places.PlacesService(map);
 }
+  
 
+  
 function indexLoad() {
   var request = {
     bounds: map.getBounds(),
@@ -363,6 +365,10 @@ function showResults(places) {
 }
 
 $(document).ready(function() {
+  var cookie=unescape($.cookie('history'))
+  var history=cookie.split(',')
+  console.log(history);
+	
   var sidebar = false;
   var sortbar = false;
 
@@ -428,11 +434,6 @@ $(document).ready(function() {
     }
   });
 
-  $(window).load(function() {
-    for (i = 0; i < searches.length; i++) {
-      $('#searchhistory').append("<div class=\'filter\' searchitem>" + searches[i] + "</div> ");
-    }
-  });
 
   $('#sidebaricon').hover(function() {
     $(this).css("background-image", "url('images/sidebarselected.png')");
@@ -569,10 +570,14 @@ $(document).ready(function() {
   function updateRecentSearches() {
     //var json_str = getCookie('mycookie');
     //var searches = JSON.parse(json_str);
-    var bound = searches.length > 5 ? 5 : searches.length;
+    /**$(window).load(function() {
+	 var bound = history.length > 5 ? 5 : history.length;
     for (i = 0; i < bound; i++) {
-      $('#searchhistory').append("<div class=\'filter filter-search\' searchitem>" + searches[i] + "</div> ");
+	  if (history[i] !== "undefined" ){
+		  $('#searchhistory').append('<div class="filter filter-cuisine" data-cuisineitem="' + history[i] + '">' + history[i] + '</div>');
+	  }
     }
+  });*/
   }
 
   $(document).on('click', '.filter-search', function () {
@@ -582,28 +587,33 @@ $(document).ready(function() {
     searchQuery(query);
   });
 
-  $('#search').bind("enterKey",function(e){
-    var query = $(this).val();
-    window.location.replace('results.html?query=' + query);
-    // if (searches.length >= 5) {
-    //   searches.splice(0, 1);
-    // }
-    //searches.push(query);
-    // searchQuery(query);
-    // $('.filter-search').each(function () {
-    //   $(this).remove();
-    // });
-    // var json_str = JSON.stringify(searches);
-    // createCookie('mycookie', json_str);
-    // updateRecentSearches();
-  });
+  $('#search').keydown( function(e) {
+	   var key = e.charCode ? e.charCode : e.keyCode ? e.keyCode : 0;
+	   if(key == 13) {
+		   var query = $(this).val();
+			history.push(query);
+			$.cookie('history', escape(history.join(',')), {expires:1234});
+			console.log("hi");
+			window.location.replace('results.html?query=' + query);
+			updateRecentSearches();
+	   }
+   });
 
   $('#search').keyup(function(e){
     if(e.keyCode == 13) {
       $(this).trigger("enterKey");
     }
   });
-
+  $(window).load(function() {
+	 var bound = history.length > 5 ? 5 : history.length;
+    for (i = 0; i < bound; i++) {
+		console.log(history[0]);
+		console.log(history[1]);
+	  if (history[i] !== "undefined" ){
+		  $('#searchhistory').append('<div class="filter filter-cuisine" data-cuisineitem="' + history[ history.length-i] + '">' + history[history.length-i] + '</div>');
+	  }
+    }
+  });
   $('#sortbox').click(function() {
     if (sortbar) {
       $('#sortbar').css("display", "none");
