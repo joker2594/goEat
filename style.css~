@@ -161,6 +161,7 @@ body {
 
 
 #sortbox {
+	
 	float: right;
 	padding-bottom: 10px;
 	cursor: pointer;
@@ -205,8 +206,9 @@ hr {
     margin-bottom: -1em;
     margin-left: auto;
     margin-right: auto;
-    border-style: inset #008080;
+    border-style: inset ;
     border-width: 1px;
+    border-color: #008080;
 }
 .reviews-title{
    font-size:1.3em;
@@ -253,14 +255,17 @@ hr {
 }
 
 #sortbar {
-	width: inherit;
+	overflow: scroll;
+	height: auto;
 	float: right;
+	width: inherit;
 	display: none;
 	z-index: 1;
 	cursor: pointer;
 }
 
 .sortoption {
+	
 	width: 7em;;
 	padding: 1em;
 	margin-left: 4em;

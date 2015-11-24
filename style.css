@@ -161,6 +161,7 @@ body {
 
 
 #sortbox {
+	
 	float: right;
 	padding-bottom: 10px;
 	cursor: pointer;
@@ -254,14 +255,17 @@ hr {
 }
 
 #sortbar {
-	width: inherit;
+	position:inherit;
+	height: auto;
 	float: right;
+	width: inherit;
 	display: none;
 	z-index: 1;
 	cursor: pointer;
 }
 
 .sortoption {
+	
 	width: 7em;;
 	padding: 1em;
 	margin-left: 4em;

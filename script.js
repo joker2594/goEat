@@ -154,6 +154,7 @@ function searchQuery(query) {
   $('.result').each(function () {
     $(this).remove();
   })
+
   $('#results-for').text("Results for " + query);
 
   var request = {
@@ -378,6 +379,7 @@ $(document).ready(function() {
     if (page == 'index.html') return indexLoad();
     var bool = true;
     var query = location.search.split('query=')[1];
+	query=decodeURI(query);
     if (searches.length >= 5) {
       searches.splice(0, 1);
     }
