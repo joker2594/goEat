@@ -169,7 +169,7 @@ body {
 
 .result {
 	position: auto;
-	min-height: 104px;
+	height: 110px !important;
 	width: auto;
 	border-bottom: solid #008080 1px;
 	padding-top: 4px;
@@ -255,7 +255,8 @@ hr {
 }
 
 #sortbar {
-	position:inherit;
+	position:fixed;
+	margin-left:450px;
 	height: auto;
 	float: right;
 	width: inherit;
