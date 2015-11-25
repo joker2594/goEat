@@ -521,7 +521,7 @@ $(document).ready(function() {
   $(document).on("click", ".result", function() {
     $(this).css("background-color", "#f39f4c");
     var id = $(this).data('id');
-    window.location.replace('place.html?id=' + id);
+    window.location.href = 'place.html?id=' + id;
   });
 
   $(document).on("mouseenter", ".sortoption", function() {
@@ -603,18 +603,18 @@ $(document).ready(function() {
     var query = $(this).data('cuisineitem');
     //$('#search').val(query);
     //searchQuery(query);
-    window.location.replace('results.html?query=' + query);
+    window.location.href = 'results.html?query=' + query;
   });
 
   $(document).on('click', '#nearyou', function () {
-    window.location.replace('results.html?filter=near');
+    window.location.href = 'results.html?filter=near';
   });
 
   $(document).on('click', '#popular', function () {
-    window.location.replace('results.html?filter=popular');
+    window.location.href = 'results.html?filter=popular';
   });
   $(document).on('click', '#toprated', function () {
-    window.location.replace('results.html?filter=toprated');
+    window.location.href = 'results.html?filter=toprated';
   });
 
 
@@ -669,7 +669,7 @@ $(document).ready(function() {
       $.cookie('clat', escape(center.lat()), {expires:1234});
       $.cookie('clng', escape(center.lng()), {expires:1234});
       //$.cookie('zoom', escape(map.getZoom()), {expires:1234});
-			window.location.replace('results.html?query=' + query);
+			window.location.href = 'results.html?query=' + query;
 	   }
    });
 
