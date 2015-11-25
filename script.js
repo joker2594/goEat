@@ -3,6 +3,7 @@ var service;
 var clocation;
 var ulocation;
 var infoWindow;
+var homemarker;
 
 var places = [];
 var markers = [];
@@ -176,6 +177,7 @@ function searchQuery(query) {
 
 function setLocation() {
   infoWindow = new google.maps.InfoWindow({map: map});
+  if (locationGiven) infoWindow.close();
   // Try HTML5 geolocation.
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function(position) {
@@ -184,6 +186,7 @@ function setLocation() {
         lng: position.coords.longitude
       };
       // put location in cookies
+      infoWindow = new google.maps.InfoWindow({map: map});
       locationGiven = true;
       $.cookie('lat', escape(pos.lat), {expires:1234});
       $.cookie('lng', escape(pos.lng), {expires:1234});
@@ -195,9 +198,10 @@ function setLocation() {
 }
 
 function addHomeMarker(infoWindow, pos) {
+  homemarker.setMap(null);
   infoWindow.setPosition(pos);
-  infoWindow.setContent("<span style='font-weight:bold;color:#EE7600;font-size:1.5em;'>You are here.</span>");
-  var marker = new google.maps.Marker({
+  infoWindow.setContent("<span style='font-weight:bold;color:#a6a6a6;font-size:1.5em;'>You are here.</span>");
+  homemarker = new google.maps.Marker({
     map: map,
     position: pos,
     icon: {
@@ -206,9 +210,9 @@ function addHomeMarker(infoWindow, pos) {
       scaledSize: new google.maps.Size(15, 25)
     }
   });
-  google.maps.event.addListener(marker, 'click', function() {
-    infoWindow.setContent("<span style='font-weight:bold;color:#EE7600;font-size:1.5em;'>You are here.</span>");
-    infoWindow.open(map, marker);
+  google.maps.event.addListener(homemarker, 'click', function() {
+    infoWindow.setContent("<span style='font-weight:bold;color:#a6a6a6;font-size:1.5em;'>You are here.</span>");
+    infoWindow.open(map, homemarker);
   });
 }
 
@@ -230,10 +234,10 @@ function nearYou() {
       clocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
       locationGiven = true;
       infoWindow.setPosition(pos);
-      infoWindow.setContent("<span style='font-weight:bold;color:#EE7600;font-size:1.5em;'>You are here.</span>");
+      infoWindow.setContent("<span style='font-weight:bold;color:#a6a6a6;font-size:1.5em;'>You are here.</span>");
       map.setCenter(pos);
 
-      var marker = new google.maps.Marker({
+      homemarker = new google.maps.Marker({
         map: map,
         position: pos,
         icon: {
@@ -242,9 +246,9 @@ function nearYou() {
           scaledSize: new google.maps.Size(15, 25)
         }
       });
-      google.maps.event.addListener(marker, 'click', function() {
+      google.maps.event.addListener(homemarker, 'click', function() {
         infoWindow.setContent("<span style='font-weight:bold;color:#EE7600;font-size:1.5em;'>You are here.</span>");
-        infoWindow.open(map, marker);
+        infoWindow.open(map, homemarker);
       });
 
       $('#results-for').text("Near You");
@@ -399,6 +403,7 @@ $(document).ready(function() {
   var lng;
 
   $(window).load(function() {
+    homemarker = new google.maps.Marker();
     lat = unescape($.cookie('lat'));
     lng = unescape($.cookie('lng'));
     if (lat != 'undefined') {
@@ -456,12 +461,6 @@ $(document).ready(function() {
     }
   });
 
-  $('.headericon').hover(function() {
-    $(this).css("background-color", "#BE5E00");
-  }, function() {
-    $(this).css("background-color", "");
-  });
-
   $('#sidebaricon').hover(function() {
     $(this).css("background-image", "url('images/sidebarselected.png')");
   },
@@ -487,7 +486,7 @@ $(document).ready(function() {
   });
 
   $(document).on("mouseenter", ".result", function() {
-    $(this).css("background-color", "#eeeeee");
+    $(this).css("background-color", "#f8c899");
   });
 
   $(document).on("mouseleave", ".result", function() {
@@ -606,7 +605,7 @@ $(document).ready(function() {
       var placeId = $(this).data('id');
       var marker;
       var icon = {
-        url: 'images/red-marker.png',
+        url: 'images/selected.png',
         anchor: new google.maps.Point(10, 10),
         scaledSize: new google.maps.Size(15, 25)
       };
@@ -614,7 +613,7 @@ $(document).ready(function() {
         if (m.getPlace().placeId == placeId) marker = m;
       });
       marker.setIcon(icon);
-      
+
     },
     mouseleave: function () {
       var placeId = $(this).data('id');
@@ -665,6 +664,12 @@ $(document).ready(function() {
       $('#sortbox > img').attr("src", "images/shrink.png");
     }
     sortbar = !sortbar;
+  });
+
+  $('.headericon').hover(function() {
+    $(this).css("background-color", "#BE5E00");
+  }, function() {
+    $(this).css("background-color", "");
   });
 
   $('#location').click(function() {
