@@ -5,6 +5,7 @@ var ulocation;
 var infoWindow;
 
 var places = [];
+var markers = [];
 var topRatedClicked = false;
 var locationGiven = false;
 
@@ -109,13 +110,14 @@ function addMarker(place) {
     infoWindow.open(map, marker);
     });
   });
+  markers.push(marker);
 }
 
 function addResult(place) {
   openNow = null;
   if (place.opening_hours)
     openNow = place.opening_hours.open_now ? '<b style="color:#EE7600;">Open now!</b>' : 'Closed.';
-  var result = '<div class="result" data-id=' + place.place_id + '>';
+  var result = '<div class="result" data-id=' + place.place_id + ' data-index=' + (places.length - 1) + '>';
   if (place.photos)
     result += '<img class="restaurant-image" src="' + place.photos[0].getUrl({'maxWidth': 100, 'maxHeight': 100}) + '"/>';
   else
@@ -593,6 +595,27 @@ $(document).ready(function() {
     initMap();
     searchQuery(query);
   });
+
+  $(document).on({
+    mouseenter: function () {
+      var index = $(this).data('index');
+      var icon = {
+        url: 'images/red-marker.png',
+        anchor: new google.maps.Point(10, 10),
+        scaledSize: new google.maps.Size(15, 25)
+      }
+      markers[index].setIcon(icon);
+    },
+    mouseleave: function () {
+      var index = $(this).data('index');
+      var icon = {
+        url: 'images/marker.png',
+        anchor: new google.maps.Point(10, 10),
+        scaledSize: new google.maps.Size(15, 25)
+      }
+      markers[index].setIcon(icon);
+    }
+  }, '.result');
 
   $('#search').keydown( function(e) {
 	   var key = e.charCode ? e.charCode : e.keyCode ? e.keyCode : 0;
