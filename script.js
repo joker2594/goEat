@@ -121,13 +121,14 @@ function addMarker(place) {
 
 function addResult(place) {
   openNow = null;
-  if (place.opening_hours)
-    openNow = place.opening_hours.open_now ? '<b style="color:#EE7600;">Open now!</b>' : 'Closed.';
+  if (place.opening_hours) openNow = place.opening_hours.open_now;
   var result = '<div class="result" data-id=' + place.place_id + '>';
   if (place.photos)
     result += '<img class="restaurant-image" src="' + place.photos[0].getUrl({'maxWidth': 100, 'maxHeight': 100}) + '"/>';
   else
     result += '<img class="restaurant-image" src="images/restaurant.png"/>';
+  if (openNow)
+    result += '<div class="open">OPEN</div>';
   result += '<span class="title">' + place.name + '</span><div class="rating">'+ getRating(place.rating) +'</div>';
   result += '<div class="details">';
   var address = "";
@@ -135,16 +136,14 @@ function addResult(place) {
   var type = "";
   if (place.types) type = place.types[0];
   if (type == 'meal_takeaway') type = 'Restaurant and takeaway';
+  if (type == 'night_club') type = 'Night club';
   type = type.charAt(0).toUpperCase() + type.slice(1);
-  result += '<b>Type:</b> ' + type;
-  result += '<br/><b>Address:</b> ' + address + '<br/>';
-  result += '<b>Distance:</b> ' + place.distance + ' km from ';
-  if (locationGiven) result += 'your current location<br/>';
+  result += '<table><tr><td align="center"><i class="fa fa-cutlery"></i></td><td> ' + type;
+  result += '</td></tr><tr><td align="center"><i class="fa fa-map-marker"></i></td><td> ' + address + '</td></tr>';
+  result += '<tr><td align="center"><i class="fa fa-road"></i></td><td> ' + place.distance + ' km from ';
+  if (locationGiven) result += 'your current location</td></tr></table>';
   else result += 'City Centre<br/>';
-  if (openNow)
-    result += openNow;
-  else
-    result += 'No info about opening hours.' + '</div></div>';
+  result += '</div></div>';
   $('#results').append(result);
 }
 
@@ -279,7 +278,7 @@ function callbackid(place, status) {
   if (status == google.maps.places.PlacesServiceStatus.OK) {
     map = new google.maps.Map(document.getElementById('map'), {
       center: place.geometry.location,
-      zoom: 17
+      zoom: 15
     });
 
     var infoWindow = new google.maps.InfoWindow({
@@ -292,7 +291,7 @@ function callbackid(place, status) {
       icon: {
         url: 'images/marker.png',
         anchor: new google.maps.Point(10, 10),
-        scaledSize: new google.maps.Size(25, 40)
+        scaledSize: new google.maps.Size(15, 25)
       }
     });
 
@@ -305,20 +304,53 @@ function callbackid(place, status) {
 
 function createPlaceView(place) {
   $('#placeheader').text(place.name);
+  $('#placeheader').append('<div id="headerrating">'+ getRating(place.rating) +'</div>');
+
+
 
 	//photo first
-	var result = '<div class="place-details">';
+	var result = '<div style="height: 3em;"></div><div class="place-details">';
     	if (place.photos)
-		result += '<img class="restaurant-image-large" src="' + place.photos[0].getUrl({'maxWidth': 500, 'maxHeight': 300}) + '"/>';
+		result += '<div id="imagecontainer"><img class="restaurant-image-large" src="' + place.photos[0].getUrl({'maxWidth': 250, 'maxHeight': 150}) + '"/></div>';
 	else
-		result += '<img class="restaurant-image-large" src="images/restaurant.png"/>';
-	//name and rating
-	result += '<br> <span class="title-placeP">' + place.name + '<hr> </span><div class="rating-placeP">'+ getRating(place.rating) +'</div>';
+		result += '<div id="imagecontainer"><img class="restaurant-image-large" src="images/restaurant.png"/></div>';
+    //address
+          var address = place.formatted_address.split(', United Kingdom')[0];
+           result+='<div class="details"><i class="fa fa-map-marker"></i> ' + address + '<br/>';
+    //type
+          var type = place.types[0];
+          if (type == 'meal_takeaway') type = 'Restaurant and takeaway';
+          if (type == 'night_club') type = "Night club";
+          type = type.charAt(0).toUpperCase() + type.slice(1);
+          result += '<i class="fa fa-cutlery"></i> ' + type;
+    //telephone
+    var tel=place.formatted_phone_number;
+    result+= '<br/><i class="fa fa-phone"></i> ' + tel ;
+    //site
+    var site=place.website;
+    if (site)	result+= '<br><i class="fa fa-globe"></i> <a style="text-decoration:none" href="'+ site + '">' + site + '</a><br/>';
+    //price level
+    var priceLevel=place.price_level;
+    var formattedPriceLevel;
+
+    if (priceLevel==0){
+      formattedPriceLevel= 'Free';
+    }else if (priceLevel==1){
+      formattedPriceLevel= 'Inexpensive';
+    }else if (priceLevel==2){
+      formattedPriceLevel= 'Moderate';
+    }else if (priceLevel==3){
+      formattedPriceLevel= 'Expensive';
+    }else if (priceLevel==4){
+      formattedPriceLevel= 'Very Expensive';
+    }else formattedPriceLevel= 'No details about pricing';
+
+    result+= '<i class="fa fa-gbp"></i> ' + formattedPriceLevel +'<br>' ;
 	//opening hours
 	openNow = null;
-	hours = '<br><b>Opening hours: <br></b>';
+	hours = '<br><i class="fa fa-calendar"></i> <b>Opening hours: <br></b>';
 	if (place.opening_hours){
-		openNow = place.opening_hours.open_now ? '<b style="color:#EE7600;">Open now!</b>' : 'Closed now.' + '<br>';
+		openNow = place.opening_hours.open_now ? '<b style="color:#EE7600;padding-left:5px"><i class="fa fa-exclamation"></i> Open now!</b>' : 'Closed now.' + '<br>';
 		for (i=0; i<7;i++){
 			hours+= place.opening_hours.weekday_text[i]+ '<br/>      ';
 		}
@@ -329,39 +361,8 @@ function createPlaceView(place) {
         	result += 'No info about opening hours.' + '</div></div>';
 	result
 	//details
-	result += '<div class="details"> '+hours;
-	//address
-      	var address = place.formatted_address.split(', United Kingdom')[0];
-	result+='<br/><b>Address:</b> ' + address + '<br/>';
-	//type
-      	var type = place.types[0];
-      	if (type == 'meal_takeaway') type = 'Restaurant and takeaway';
-        if (type == 'night_club') type = "Night club";
-      	type = type.charAt(0).toUpperCase() + type.slice(1);
-      	result += '<b>Type:</b> ' + type;
-	//telephone
-	var tel=place.formatted_phone_number;
-	result+= '<br><b>Phone Number: </b>' + tel ;
-	//site
-	var site=place.website;
-	result+= '<br><b>Website: </b> <a href="'+ site + '">Visit '+place.name+'</a><br/>';
-	//price level
-	var priceLevel=place.price_level;
-	var formattedPriceLevel;
+	result += hours;
 
-	if (priceLevel==0){
-		formattedPriceLevel= 'Free';
-	}else if (priceLevel==1){
-		formattedPriceLevel= 'Inexpensive';
-	}else if (priceLevel==2){
-		formattedPriceLevel= 'Moderate';
-	}else if (priceLevel==3){
-		formattedPriceLevel= 'Expensive';
-	}else if (priceLevel==4){
-		formattedPriceLevel= 'Very Expensive';
-	}else formattedPriceLevel= 'No details about pricing';
-
-	result+= '<br><b>Price level: </b>' + formattedPriceLevel +'<br>' ;
 	var i=0;
 	if (place.reviews){
 		result+='<br> <hr><br><div class="reviews-title"> Reviews: </b> </div>';

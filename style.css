@@ -169,13 +169,28 @@ body {
 }
 
 #placeheader{
+	position: fixed;
 	cursor: default;
-	width: auto;
+	width: 40%;
+	height: 1.5em;
 	padding: 1em;
+	font-size: 1em;
 	color: white;
 	background-color: #198c8c;
-	z-index: -1;
+	z-index: 1;
 	font-weight: bold;
+}
+
+#headerrating {
+	float: right;
+	padding-right: 5%;
+	font-size: 1em;
+	color: #EE7600;
+}
+
+#imagecontainer {
+	width: 100%;
+	background-color: #d3d3d3;
 }
 
 
@@ -187,6 +202,7 @@ body {
 
 .result {
 	width: auto;
+	min-height: 106px;
 	border-bottom: solid #008080 1px;
 	padding-top: 4px;
 	padding-right: 2px;
@@ -198,8 +214,7 @@ body {
 	min-height: 104px;
 	width: auto;
 	padding-top: 4px;
-	padding-right: 2px;
-	cursor: pointer;
+	background-color: #fdfdfd;
 	z-index: 1;
 }
 
@@ -207,13 +222,6 @@ body {
 	padding: 5px;
 	color: #007373;
 	font-size: 1.3em;
-	font-weight: bold;
-}
-
-.title-placeP{
-	padding: 5px;
-	color: #007373;
-	font-size: 2em;
 	font-weight: bold;
 }
 
@@ -239,11 +247,6 @@ hr {
 	color: #EE7600;
 }
 
-.rating-placeP {
-	font-size: 1.8em;
-	color: #EE7600;
-}
-
 .details {
 	padding-bottom: 1px;
 	padding-left: 10px;
@@ -259,10 +262,9 @@ hr {
 }
 
 .restaurant-image-large {
-	position:relative;
-	height: 200px;
-	width: 400px;
-	border: 1px solid #EE7600;
+	display: block;
+	position: relative;
+	margin: auto;
 }
 
 .markerlink {
@@ -293,4 +295,16 @@ hr {
 	border: 1px solid #008080;
 	border-top: none;
 	color: black;
+}
+
+.open {
+	font-size: 0.7em;
+	width: 3em;
+	padding: 0.1em;
+	background-color: #EE7600;
+	text-align: center;
+	color: #F8EEE5;
+	float: left;
+	margin-top: 0.35em;
+	margin-left: 0.5em;
 }
