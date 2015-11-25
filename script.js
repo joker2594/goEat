@@ -54,7 +54,8 @@ function callback(results, status) {
         addHomeMarker(infoWindow, ulocation);
       }
       addResult(place);
-      addMarker(place);
+      var marker = addMarker(place);
+      markers.push(marker);
     }
   }
 }
@@ -90,6 +91,10 @@ function addMarker(place) {
       url: 'images/marker.png',
       anchor: new google.maps.Point(10, 10),
       scaledSize: new google.maps.Size(15, 25)
+    },
+    place: {
+      location: place.geometry.location,
+      placeId: place.place_id
     }
   });
   google.maps.event.addListener(marker, 'click', function() {
@@ -110,14 +115,14 @@ function addMarker(place) {
     infoWindow.open(map, marker);
     });
   });
-  markers.push(marker);
+  return marker;
 }
 
 function addResult(place) {
   openNow = null;
   if (place.opening_hours)
     openNow = place.opening_hours.open_now ? '<b style="color:#EE7600;">Open now!</b>' : 'Closed.';
-  var result = '<div class="result" data-id=' + place.place_id + ' data-index=' + (places.length - 1) + '>';
+  var result = '<div class="result" data-id=' + place.place_id + '>';
   if (place.photos)
     result += '<img class="restaurant-image" src="' + place.photos[0].getUrl({'maxWidth': 100, 'maxHeight': 100}) + '"/>';
   else
@@ -598,22 +603,31 @@ $(document).ready(function() {
 
   $(document).on({
     mouseenter: function () {
-      var index = $(this).data('index');
+      var placeId = $(this).data('id');
+      var marker;
       var icon = {
         url: 'images/red-marker.png',
         anchor: new google.maps.Point(10, 10),
         scaledSize: new google.maps.Size(15, 25)
-      }
-      markers[index].setIcon(icon);
+      };
+      markers.forEach(function (m) {
+        if (m.getPlace().placeId == placeId) marker = m;
+      });
+      marker.setIcon(icon);
+      
     },
     mouseleave: function () {
-      var index = $(this).data('index');
+      var placeId = $(this).data('id');
+      var marker;
       var icon = {
         url: 'images/marker.png',
         anchor: new google.maps.Point(10, 10),
         scaledSize: new google.maps.Size(15, 25)
-      }
-      markers[index].setIcon(icon);
+      };
+      markers.forEach(function (m) {
+        if (m.getPlace().placeId == placeId) marker = m;
+      });
+      marker.setIcon(icon);
     }
   }, '.result');
 
