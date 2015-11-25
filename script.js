@@ -10,11 +10,26 @@ var markers = [];
 var topRatedClicked = false;
 var locationGiven = false;
 
-function initMap() {
+function getMapCenter() {
+  var page = document.URL.split('goEat/')[1];
   clocation = new google.maps.LatLng(55.863791, -4.251667);
+  var lat = unescape($.cookie('clat'));
+  var lng = unescape($.cookie('clng'));
+  if (lat != 'undefined') clocation = new google.maps.LatLng(parseFloat(lat), parseFloat(lng));
+  if (page == 'index.html') clocation = new google.maps.LatLng(55.863791, -4.251667);
+  return clocation;
+}
+
+// function getMapZoom() {
+//   var zoom = unescape($.cookie('zoom'));
+//   return parseInt(zoom);
+// }
+
+function initMap() {
+
   map = new google.maps.Map(document.getElementById('map'), {
-    center: clocation,
-    zoom: 15
+    center: getMapCenter(),
+    zoom: 14
   });
 
   infoWindow = new google.maps.InfoWindow();
@@ -129,7 +144,7 @@ function addResult(place) {
     result += '<img class="restaurant-image" src="images/restaurant.png"/>';
   if (openNow)
     result += '<div class="open">OPEN</div>';
-  result += '<span class="title">' + place.name + '</span><div class="rating">'+ getRating(place.rating) +'</div>';
+  result += '<span class="title">' + place.name + '</span><div style="font-size: 1em" class="rating">'+ getIconRating(place.rating) +'</div>';
   result += '<div class="details">';
   var address = "";
   if (place.formatted_address) address = place.formatted_address.split(', United Kingdom')[0];
@@ -154,6 +169,16 @@ function getRating(rating) {
   if (rate == 0) return stars;
   for (var i = 0; i < rate; i++) stars += "★";
   for (var i = rate; i < 5; i++) stars += "☆";
+  return stars;
+}
+
+function getIconRating(rating) {
+  // round rating
+  var rate = Math.round(rating);
+  var stars = "";
+  if (rate == 0) return stars;
+  for (var i = 0; i < rate; i++) stars += '<i class="fa fa-star"></i>';
+  for (var i = rate; i < 5; i++) stars += '<i class="fa fa-star-o"></i>';
   return stars;
 }
 
@@ -218,7 +243,7 @@ function addHomeMarker(infoWindow, pos) {
 function nearYou() {
   map = new google.maps.Map(document.getElementById('map'), {
     center: clocation,
-    zoom: 15,
+    zoom: 16,
   });
   infoWindow = new google.maps.InfoWindow({map: map});
 
@@ -278,7 +303,7 @@ function callbackid(place, status) {
   if (status == google.maps.places.PlacesServiceStatus.OK) {
     map = new google.maps.Map(document.getElementById('map'), {
       center: place.geometry.location,
-      zoom: 15
+      zoom: 16
     });
 
     var infoWindow = new google.maps.InfoWindow({
@@ -304,31 +329,30 @@ function callbackid(place, status) {
 
 function createPlaceView(place) {
   $('#placeheader').text(place.name);
-  $('#placeheader').append('<div id="headerrating">'+ getRating(place.rating) +'</div>');
-
-
+  $('#placeheader').append('<div id="headerrating">'+ getIconRating(place.rating) +'</div>');
 
 	//photo first
 	var result = '<div style="height: 3em;"></div><div class="place-details">';
     	if (place.photos)
-		result += '<div id="imagecontainer"><img class="restaurant-image-large" src="' + place.photos[0].getUrl({'maxWidth': 250, 'maxHeight': 150}) + '"/></div>';
+		result += '<div id="imagecontainer"><img class="restaurant-image-large" src="' + place.photos[0].getUrl({'maxWidth': 500, 'maxHeight': 300}) + '"/></div>';
 	else
 		result += '<div id="imagecontainer"><img class="restaurant-image-large" src="images/restaurant.png"/></div>';
     //address
           var address = place.formatted_address.split(', United Kingdom')[0];
-           result+='<div class="details"><i class="fa fa-map-marker"></i> ' + address + '<br/>';
+           result+='<div class="details"><table align="center"><tr><td align="center"><i class="fa fa-map-marker"></i></td><td> ' + address + '</td></tr>';
     //type
           var type = place.types[0];
           if (type == 'meal_takeaway') type = 'Restaurant and takeaway';
           if (type == 'night_club') type = "Night club";
           type = type.charAt(0).toUpperCase() + type.slice(1);
-          result += '<i class="fa fa-cutlery"></i> ' + type;
+          result += '<tr><td align="center"><i class="fa fa-cutlery"></i></td><td> ' + type;
     //telephone
     var tel=place.formatted_phone_number;
-    result+= '<br/><i class="fa fa-phone"></i> ' + tel ;
+    result+= '</td></tr><tr><td align="center"><i class="fa fa-phone"></i></td><td> ' + tel ;
+    result += '</td></tr>'
     //site
     var site=place.website;
-    if (site)	result+= '<br><i class="fa fa-globe"></i> <a style="text-decoration:none" href="'+ site + '">' + site + '</a><br/>';
+    if (site)	result+= '<tr><td align="center"><i class="fa fa-globe"></i></td><td> <a style="text-decoration:none" href="'+ site + '">' + site + '</a></td></tr>';
     //price level
     var priceLevel=place.price_level;
     var formattedPriceLevel;
@@ -345,38 +369,38 @@ function createPlaceView(place) {
       formattedPriceLevel= 'Very Expensive';
     }else formattedPriceLevel= 'No details about pricing';
 
-    result+= '<i class="fa fa-gbp"></i> ' + formattedPriceLevel +'<br>' ;
+    result+= '<tr><td><i class="fa fa-gbp"></i></td><td> ' + formattedPriceLevel +'</td></tr></table></div>' ;
 	//opening hours
+  var hours = "";
 	openNow = null;
-	hours = '<br><i class="fa fa-calendar"></i> <b>Opening hours: <br></b>';
-	if (place.opening_hours){
-		openNow = place.opening_hours.open_now ? '<b style="color:#EE7600;padding-left:5px"><i class="fa fa-exclamation"></i> Open now!</b>' : 'Closed now.' + '<br>';
-		for (i=0; i<7;i++){
-			hours+= place.opening_hours.weekday_text[i]+ '<br/>      ';
-		}
-	}
-	if (openNow)
-       		result += openNow ;
-      	else
-        	result += 'No info about opening hours.' + '</div></div>';
-	result
-	//details
-	result += hours;
+  result += '<div class="placesection"><i class="fa fa-calendar"></i> Opening hours</div>';
+  result += "<div class='details' align='center'>"
+	if (place.opening_hours) openNow = place.opening_hours.open_now ? '<b>Open now!</b>' : '<b>Closed.</b>';
+  if (openNow) {
+    hours += openNow + "<br/>";
+    for (i=0; i<7;i++){
+      hours+= place.opening_hours.weekday_text[i]+ '<br/>';
+    }
+  } else {
+    hours += 'Opening hours not available.' + '</div></div>';
+  }
+	result += hours + "</div>";
 
 	var i=0;
 	if (place.reviews){
-		result+='<br> <hr><br><div class="reviews-title"> Reviews: </b> </div>';
-		result+='<hr> <br>';
+		result+='<div class="placesection"><i class="fa fa-newspaper-o"></i> Reviews</div>';
 		var reviews= place.reviews;
+    result += '<div class="details">'
 		$.each(reviews, function(key, value){
 			if (i<6){
-				result+='<b>'+ value.author_name+ '</b>' +'<br>'+value.text + '<br> Rating: '+value.rating+'<br><br>';
+				result+='<div class="review"><i class="fa fa-user"></i> <b>'+ value.author_name+ '</b>' +'<br>'+value.text + '<br><b>Rating:</b> '+getRating(value.rating)+'</div>';
 			}
 			i++;
 		})
-	}else{
-		result+='<br>No reviews for this place.';
+	} else {
+		result+='No reviews for this place.';
 	}
+  result += '</div>'
       $('#place').append(result);
 }
 
@@ -635,8 +659,16 @@ $(document).ready(function() {
 	   var key = e.charCode ? e.charCode : e.keyCode ? e.keyCode : 0;
 	   if(key == 13) {
 		   var query = $(this).val();
-			history.push(query);
+       console.log(history.indexOf(query));
+			if (history.indexOf(query) == -1) {
+        if (history.length == 5) history = history.slice(1);
+        history.push(query);
+      }
 			$.cookie('history', escape(history.join(',')), {expires:1234});
+      var center = map.getCenter();
+      $.cookie('clat', escape(center.lat()), {expires:1234});
+      $.cookie('clng', escape(center.lng()), {expires:1234});
+      //$.cookie('zoom', escape(map.getZoom()), {expires:1234});
 			window.location.replace('results.html?query=' + query);
 	   }
    });
@@ -647,10 +679,9 @@ $(document).ready(function() {
     }
   });
   $(window).load(function() {
-	 var bound = history.length > 5 ? 5 : history.length;
-    for (i = 0; i < bound; i++) {
+    for (i = 0; i < history.length; i++) {
 	  if (history[i] !== "undefined" ){
-		  $('#searchhistory').append('<div class="filter filter-cuisine" data-cuisineitem="' + history[ history.length-i] + '">' + history[history.length-i] + '</div>');
+		  $('#searchhistory').append('<div class="filter filter-cuisine" data-cuisineitem="' + history[i] + '">' + history[i] + '</div>');
 	  }
     }
   });

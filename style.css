@@ -152,7 +152,7 @@ body {
 
 #place {
 	height: inherit;
-	width: 40%;
+	width: 35%;
 	background-color: #fdfdfd;
 	z-index: 0;
 	float: right;
@@ -171,14 +171,13 @@ body {
 #placeheader{
 	position: fixed;
 	cursor: default;
-	width: 40%;
+	width: 35%;
 	height: 1.5em;
 	padding: 1em;
 	font-size: 1em;
 	color: white;
 	background-color: #198c8c;
 	z-index: 1;
-	font-weight: bold;
 }
 
 #headerrating {
@@ -191,6 +190,19 @@ body {
 #imagecontainer {
 	width: 100%;
 	background-color: #d3d3d3;
+}
+
+.placesection {
+	padding: 0.5em;
+	background-color: #d3d3d3;
+}
+
+.review {
+	background-color: #f1f1f1;
+	padding: 0.5em;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+	margin-right: 0.5em;
 }
 
 
@@ -251,7 +263,7 @@ hr {
 	padding-bottom: 1px;
 	padding-left: 10px;
 	padding-top: 2px;
-	color: #595959;
+	color: #474747;
 }
 
 .restaurant-image {
