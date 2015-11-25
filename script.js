@@ -20,13 +20,7 @@ function getMapCenter() {
   return clocation;
 }
 
-// function getMapZoom() {
-//   var zoom = unescape($.cookie('zoom'));
-//   return parseInt(zoom);
-// }
-
 function initMap() {
-
   map = new google.maps.Map(document.getElementById('map'), {
     center: getMapCenter(),
     zoom: 14
@@ -183,7 +177,6 @@ function getIconRating(rating) {
 }
 
 function searchQuery(query) {
-  //clearMarkers();
   places = [];
   $('.result').each(function () {
     $(this).remove();
@@ -474,7 +467,7 @@ $(document).ready(function() {
         }
       }
     } else {
-      initMap()
+      initMap();
       query = decodeURI(query);;
       searchQuery(query);
     }
@@ -601,8 +594,9 @@ $(document).ready(function() {
 
   $(document).on('click', '.filter-cuisine', function () {
     var query = $(this).data('cuisineitem');
-    //$('#search').val(query);
-    //searchQuery(query);
+    var center = map.getCenter();
+    $.cookie('clat', escape(center.lat()), {expires:1234});
+    $.cookie('clng', escape(center.lng()), {expires:1234});
     window.location.href = 'results.html?query=' + query;
   });
 
@@ -621,6 +615,9 @@ $(document).ready(function() {
   $(document).on('click', '.filter-search', function () {
     var query = $(this).text();
     $('#search').val(query);
+    var center = map.getCenter();
+    $.cookie('clat', escape(center.lat()), {expires:1234});
+    $.cookie('clng', escape(center.lng()), {expires:1234});
     initMap();
     searchQuery(query);
   });
@@ -668,7 +665,6 @@ $(document).ready(function() {
       var center = map.getCenter();
       $.cookie('clat', escape(center.lat()), {expires:1234});
       $.cookie('clng', escape(center.lng()), {expires:1234});
-      //$.cookie('zoom', escape(map.getZoom()), {expires:1234});
 			window.location.href = 'results.html?query=' + query;
 	   }
    });
