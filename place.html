@@ -22,15 +22,17 @@
     <div id="wrapper">
       <div id="header">
         <div id="sidebaricon"></div>
+        <div title="Click to set your current location" id="location" class="headericon"></div>
+        <div id="usericon" class="headericon"></div>
         <div onclick="location.href='index.html'" id="logo">goEat</div>
         <div id="searchbox"><input id="search" type="text" placeholder="Search for dishes or restaurants..." /></div>
       </div>
       <div id="sidebar"><div style="height: 3em;"></div>
         <div class="category">Filter<img id="filtertoggle" class="catshrink" src='images/shrink.png'/></div>
         <div id="filters">
-          <div class="filter">Most popular</div>
-          <div class="filter">Top rated</div>
-          <div class="filter">Near you</div>
+          <div id="popular" class="filter">Most popular</div>
+          <div id="toprated" class="filter">Top rated</div>
+          <div id="nearyou" class="filter">Near you</div>
         </div>
         <div class="category">Cuisine<img id="cuisinetoggle" class="catexpand" src='images/expand.png'/></div><div id="cats"></div>
         <div class="category">Recent Searches<img id="searchtoggle" class="catexpand" src='images/expand.png'/></div><div id="searchhistory"></div>
@@ -47,4 +49,3 @@
     </div>
   </body>
 </html>
-
