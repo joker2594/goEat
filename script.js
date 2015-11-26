@@ -1,8 +1,11 @@
 var map;
 var service;
+// center location used for map
 var clocation;
+// location used for calculating distance between user and places
 var ulocation;
 var infoWindow;
+// marker of current location
 var homemarker;
 
 var places = [];
@@ -12,12 +15,14 @@ var locationGiven = false;
 var loggedin = 0;
 
 function getMapCenter() {
+  // if at index, reset center of map to Glasgow city centre
   var page = document.URL.split('goEat/')[1];
   clocation = new google.maps.LatLng(55.863791, -4.251667);
   if (page == 'index.html') {
     $.cookie('clat', escape("55.863791"), {expires:1234});
     $.cookie('clng', escape("-4.251667"), {expires:1234});
   }
+  // get previous center of map from cookies
   var lat = unescape($.cookie('clat'));
   var lng = unescape($.cookie('clng'));
   if (lat != 'undefined') clocation = new google.maps.LatLng(parseFloat(lat), parseFloat(lng));
@@ -25,16 +30,17 @@ function getMapCenter() {
 }
 
 function initMap() {
+  // initialise map, default Google Maps function
   map = new google.maps.Map(document.getElementById('map'), {
     center: getMapCenter(),
     zoom: 14
   });
-
   infoWindow = new google.maps.InfoWindow();
   service = new google.maps.places.PlacesService(map);
 }
 
 function indexLoad() {
+  // radar search of restaurants in GLasgow used in index page
   var request = {
     bounds: map.getBounds(),
     types: ['restaurant', 'meal_takeaway'],
@@ -42,6 +48,7 @@ function indexLoad() {
   service.radarSearch(request, callback);
 }
 
+// sort results stored in places list by rating
 function sortByRating(list) {
   var sorted = list;
   for (var i=0; i < sorted.length -1 ; i++)
@@ -54,6 +61,7 @@ function sortByRating(list) {
   return sorted;
 }
 
+// callback function used by Google Places search
 function callback(results, status) {
   if (status == google.maps.places.PlacesServiceStatus.OK) {
     if (topRatedClicked) {
@@ -64,9 +72,11 @@ function callback(results, status) {
       var place = results[i];
       store(place);
       if (locationGiven) {
+        // if current location is set, show home marker
         infoWindow = new google.maps.InfoWindow();
         addHomeMarker(infoWindow, ulocation);
       }
+      // show result in results page
       addResult(place);
       var marker = addMarker(place);
       markers.push(marker);
@@ -74,8 +84,10 @@ function callback(results, status) {
   }
 }
 
+// callback function used by search for Near You option
 function callbacknear(results, status) {
   if (status == google.maps.places.PlacesServiceStatus.OK) {
+    // results limited to 9 because of query limits
     for (var i = 0; i < 9; i++) {
       var place = results[i];
       service.getDetails(place, function(result, status) {
@@ -91,18 +103,22 @@ function callbacknear(results, status) {
   }
 }
 
+// save current map center to cookies
 function saveMapCenter() {
   var center = map.getCenter();
   $.cookie('clat', escape(center.lat()), {expires:1234});
   $.cookie('clng', escape(center.lng()), {expires:1234});
 }
 
+// stores a place in the places list
 function store(place) {
   if (!place.rating) place.rating = 0;
+  // calculate distance between place and centre of Glasgow or current location
   place.distance = (google.maps.geometry.spherical.computeDistanceBetween(ulocation, place.geometry.location) / 1000).toFixed(2);
   places.push(place);
 }
 
+// add marker of the place to map
 function addMarker(place) {
   var marker = new google.maps.Marker({
     map: map,
@@ -123,6 +139,7 @@ function addMarker(place) {
       console.error(status);
       return;
     }
+    // add details in infoWindow
     website = "<br/>";
     var address = "";
     if (result.formatted_address) address = result.formatted_address.split(', United Kingdom')[0];
@@ -138,10 +155,13 @@ function addMarker(place) {
   return marker;
 }
 
+// add place to results
 function addResult(place) {
+  // opening hours
   openNow = null;
   if (place.opening_hours) openNow = place.opening_hours.open_now;
   var result = '<div class="result" data-id=' + place.place_id + '>';
+  // photo
   if (place.photos)
     result += '<img class="restaurant-image" src="' + place.photos[0].getUrl({'maxWidth': 100, 'maxHeight': 100}) + '"/>';
   else
@@ -150,11 +170,24 @@ function addResult(place) {
     result += '<div class="open">OPEN</div>';
   result += '<span class="title">' + place.name + '</span><div style="font-size: 1em" class="rating">'+ getIconRating(place.rating) +'</div>';
   result += '<div class="details">';
-  var address = "";
-  if (place.formatted_address) address = place.formatted_address.split(', United Kingdom')[0];
+  // type
   var type = "";
   if (place.types) type = place.types[0];
   result += '<table><tr><td align="center">'
+  result += getType(type);
+  // address
+  var address = "";
+  if (place.formatted_address) address = place.formatted_address.split(', United Kingdom')[0];
+  result += '</td></tr><tr><td align="center"><i class="fa fa-map-marker"></i></td><td> ' + address + '</td></tr>';
+  // distance
+  result += '<tr><td align="center"><i class="fa fa-road"></i></td><td> ' + place.distance + ' km from ';
+  if (locationGiven) result += 'your current location</td></tr></table>';
+  else result += 'City Centre<br/>';
+  result += '</div></div>';
+  $('#results').append(result);
+}
+
+function getType(type) {
   switch (type) {
     case 'meal_takeaway':
       type = '<i class="fa fa-cutlery"></i></td><td> Restaurant and takeaway';
@@ -171,15 +204,10 @@ function addResult(place) {
     default:
       type = '<i class="fa fa-cutlery"></i></td><td> ' + type.charAt(0).toUpperCase() + type.slice(1);
   }
-  result += type;
-  result += '</td></tr><tr><td align="center"><i class="fa fa-map-marker"></i></td><td> ' + address + '</td></tr>';
-  result += '<tr><td align="center"><i class="fa fa-road"></i></td><td> ' + place.distance + ' km from ';
-  if (locationGiven) result += 'your current location</td></tr></table>';
-  else result += 'City Centre<br/>';
-  result += '</div></div>';
-  $('#results').append(result);
+  return type;
 }
 
+// return given rating in stars
 function getRating(rating) {
   // round rating
   var rate = Math.round(rating);
@@ -190,6 +218,7 @@ function getRating(rating) {
   return stars;
 }
 
+// return given rating in star icons
 function getIconRating(rating) {
   // round rating
   var rate = Math.round(rating);
@@ -200,14 +229,14 @@ function getIconRating(rating) {
   return stars;
 }
 
+// search for places with given query
 function searchQuery(query) {
   places = [];
   $('.result').each(function () {
     $(this).remove();
   })
-
+  // put query in results header
   $('#results-for').text("Results for " + query);
-
   var request = {
     bounds: map.getBounds(),
     query: query,
@@ -216,6 +245,7 @@ function searchQuery(query) {
   service.textSearch(request, callback);
 }
 
+// use geolocation to get user's current location
 function setLocation() {
   infoWindow = new google.maps.InfoWindow({map: map});
   if (locationGiven) infoWindow.close();
@@ -238,6 +268,7 @@ function setLocation() {
   }
 }
 
+// adds home marker to map
 function addHomeMarker(infoWindow, pos) {
   homemarker.setMap(null);
   infoWindow.setPosition(pos);
@@ -257,6 +288,7 @@ function addHomeMarker(infoWindow, pos) {
   });
 }
 
+// shows places near you within a 500 metre readius
 function nearYou() {
   map = new google.maps.Map(document.getElementById('map'), {
     center: clocation,
@@ -291,9 +323,7 @@ function nearYou() {
         infoWindow.setContent("<span style='font-weight:bold;color:#EE7600;font-size:1.5em;'>You are here.</span>");
         infoWindow.open(map, homemarker);
       });
-
       $('#results-for').text("Near You");
-
       var request = {
         types: ['restaurant', 'meal_takeaway'],
         location: pos,
@@ -309,6 +339,7 @@ function nearYou() {
   }
 }
 
+// used by geolocation function
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
   infoWindow.setPosition(pos);
   infoWindow.setContent(browserHasGeolocation ?
@@ -316,9 +347,11 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
                         'Error: Your browser doesn\'t support geolocation.');
 }
 
+// callback function used by search in place page
 function callbackid(place, status) {
   if (status == google.maps.places.PlacesServiceStatus.OK) {
     map = new google.maps.Map(document.getElementById('map'), {
+      // center map at current place's location
       center: place.geometry.location,
       zoom: 14
     });
@@ -327,6 +360,7 @@ function callbackid(place, status) {
       content:"<a style='color:#008080;text-decoration:none;font-size:2em;font-weight:bold;'>" + place.name + "</a>"
     });
 
+    // add marker at current place
     var marker = new google.maps.Marker({
       map: map,
       position: place.geometry.location,
@@ -336,72 +370,56 @@ function callbackid(place, status) {
         scaledSize: new google.maps.Size(15, 25)
       }
     });
-
     marker.addListener('click', function() {
       infoWindow.open(map, marker);
     });
+    // add place details in page
     createPlaceView(place);
   }
 }
 
+// create place details page
 function createPlaceView(place) {
+  // name
   $('#placeheader').text(place.name);
+  // rating
   $('#placeheader').append('<div id="headerrating">'+ getIconRating(place.rating) +'</div>');
-
-	//photo first
+	// photo, if no photos are available, use default image
 	var result = '<div style="height: 3em;"></div><div class="place-details">';
-    	if (place.photos)
+	if (place.photos)
 		result += '<div id="imagecontainer"><img class="restaurant-image-large" src="' + place.photos[0].getUrl({'maxWidth': 500, 'maxHeight': 300}) + '"/></div>';
 	else
 		result += '<div id="imagecontainer"><img class="restaurant-image-large" src="images/restaurant.png"/></div>';
-    //address
-          var address = place.formatted_address.split(', United Kingdom')[0];
-           result+='<div class="details"><table align="center"><tr><td align="center"><i class="fa fa-map-marker"></i></td><td> ' + address + '</td></tr>';
-    //type
-      result += '<tr><td align="center">'
-      var type = place.types[0];
-      switch (type) {
-        case 'meal_takeaway':
-          type = '<i class="fa fa-cutlery"></i></td><td> Restaurant and takeaway';
-          break;
-        case 'night_club':
-          type = '<i class="fa fa-glass"></i></td><td> Night Club';
-          break;
-        case 'bar':
-          type = '<i class="fa fa-glass"></i></td><td> Bar';
-          break;
-        case 'restaurant':
-          type = '<i class="fa fa-cutlery"></i></td><td> Restaurant';
-          break;
-        default:
-          type = '<i class="fa fa-cutlery"></i></td><td> ' + type.charAt(0).toUpperCase() + type.slice(1);
-      }
-      result += type;
-    //telephone
-    var tel=place.formatted_phone_number;
-    result+= '</td></tr><tr><td align="center"><i class="fa fa-phone"></i></td><td> ' + tel ;
-    result += '</td></tr>'
-    //site
-    var site=place.website;
-    if (site)	result+= '<tr><td align="center"><i class="fa fa-globe"></i></td><td> <a style="text-decoration:none" href="'+ site + '">' + site + '</a></td></tr>';
-    //price level
-    var priceLevel=place.price_level;
-    var formattedPriceLevel;
-
-    if (priceLevel==0){
-      formattedPriceLevel= 'Free';
-    }else if (priceLevel==1){
-      formattedPriceLevel= 'Inexpensive';
-    }else if (priceLevel==2){
-      formattedPriceLevel= 'Moderate';
-    }else if (priceLevel==3){
-      formattedPriceLevel= 'Expensive';
-    }else if (priceLevel==4){
-      formattedPriceLevel= 'Very Expensive';
-    }else formattedPriceLevel= 'No details about pricing';
-
-    result+= '<tr><td><i class="fa fa-gbp"></i></td><td> ' + formattedPriceLevel +'</td></tr></table></div>' ;
-	//opening hours
+  // address
+  var address = place.formatted_address.split(', United Kingdom')[0];
+   result+='<div class="details"><table align="center"><tr><td align="center"><i class="fa fa-map-marker"></i></td><td> ' + address + '</td></tr>';
+  // type
+  result += '<tr><td align="center">'
+  var type = "";
+  if (place.types) type = place.types[0];
+  result += getType(type);
+  // telephone
+  var tel=place.formatted_phone_number;
+  result+= '</td></tr><tr><td align="center"><i class="fa fa-phone"></i></td><td> ' + tel + '</td></tr>';
+  // website
+  var site=place.website;
+  if (site)	result+= '<tr><td align="center"><i class="fa fa-globe"></i></td><td> <a style="text-decoration:none" href="'+ site + '">' + site + '</a></td></tr>';
+  // price level
+  var priceLevel=place.price_level;
+  var formattedPriceLevel;
+  if (priceLevel==0){
+    formattedPriceLevel= 'Free';
+  }else if (priceLevel==1){
+    formattedPriceLevel= 'Inexpensive';
+  }else if (priceLevel==2){
+    formattedPriceLevel= 'Moderate';
+  }else if (priceLevel==3){
+    formattedPriceLevel= 'Expensive';
+  }else if (priceLevel==4){
+    formattedPriceLevel= 'Very Expensive';
+  }else formattedPriceLevel= 'No details about pricing';
+  result+= '<tr><td><i class="fa fa-gbp"></i></td><td> ' + formattedPriceLevel +'</td></tr></table></div>' ;
+	// opening hours
   var hours = "";
 	openNow = null;
   result += '<div class="placesection"><i class="fa fa-calendar"></i> Opening hours</div>';
@@ -416,7 +434,7 @@ function createPlaceView(place) {
     hours += 'Opening hours not available.' + '</div></div>';
   }
 	result += hours + "</div>";
-
+  // reviews
 	var i=0;
 	if (place.reviews){
 		result+='<div class="placesection"><i class="fa fa-newspaper-o"></i> Reviews</div>';
@@ -432,9 +450,11 @@ function createPlaceView(place) {
 		result+='No reviews for this place.';
 	}
   result += '</div>'
-      $('#place').append(result);
+  // append result to page
+  $('#place').append(result);
 }
 
+// show results in list in results page
 function showResults(places) {
   for (var i = 0; i < places.length; i++) {
     var place = places[i];
@@ -442,64 +462,78 @@ function showResults(places) {
   }
 }
 
+// logs user in, used by register and login buttons
 function submit() {
   $.cookie('loggedin', escape(1), {expires:1234});
   window.location.href = 'index.html';
 }
 
 $(document).ready(function() {
+  // get search history from cookies
   var cookie=unescape($.cookie('history'));
   var history=cookie.split(',');
 
+  // boolean variables for sidebar toggles
   var sidebar = false;
   var sortbar = false;
-
-  var cuisines = ['Chinese', 'Japanese', 'Italian', 'Greek', 'Indian'];
-
   var filtertoggle = true;
   var cuisinetoggle = false;
   var searchtoggle = false;
 
+  var cuisines = ['Chinese', 'Japanese', 'Italian', 'Greek', 'Indian'];
+
+  // store user's current location
   var lat;
   var lng;
 
   $(window).load(function() {
     homemarker = new google.maps.Marker();
+    // get user's current location from cookies
     lat = unescape($.cookie('lat'));
     lng = unescape($.cookie('lng'));
     if (lat != 'undefined') {
       ulocation = new google.maps.LatLng(parseFloat(lat), parseFloat(lng));
       locationGiven = true;
     } else {
+      // if no current location set, set location to Glasgow city centre
       ulocation = new google.maps.LatLng(55.863791, -4.251667);
       locationGiven = false;
     }
 
+    // check if user is logged in from cookies (1 for logged in, 0 otherwise)
     loggedin = unescape($.cookie('loggedin'));
+    // if logged in, hide log in and registered icons and show profile and logout icons
     if (loggedin == 1) {
       $('.loggedin').css('display', 'block');
       $('.loggedout').css('display', 'none');
     }
 
-    // check if at index
+    // if at index, go to indexLoad function
     var page = document.URL.split('goEat/')[1];
     if (page == 'index.html') return indexLoad();
+    // boolean used if not at a place page
     var bool = true;
+    // get query from URL
     var query = location.search.split('query=')[1];
 
-    if (query !=undefined)
+    if (query != undefined)
       $('#search').val(decodeURI(query));
     if (query == undefined) {
+      // if no query, check if url is for a place with a place id
       var id = location.search.split('id=')[1];
+      // if a place id is given, get details of place with that id
       if (id != undefined) {
         var request = { placeId: id };
         service = new google.maps.places.PlacesService(map);
         service.getDetails(request, callbackid);
+        // page is a place page
         var bool = false;
       }
       if (bool) {
+        // check if at filter page
         var filter = location.search.split('filter=')[1];
         if (filter == undefined) {
+          // if no filter, do default query
           initMap();
           searchQuery("restaurant");
         } else {
@@ -516,12 +550,14 @@ $(document).ready(function() {
         }
       }
     } else {
+      // normal query, search with it
       initMap();
-      query = decodeURI(query);;
+      query = decodeURI(query);
       searchQuery(query);
     }
   });
 
+  // append cuisine filters at sidebar
   $(window).load(function() {
     for (i = 0; i < cuisines.length; i++) {
       $('#cats').append('<div class="filter filter-cuisine" data-cuisineitem="' + cuisines[i] + '">' + cuisines[i] + '</div>');
@@ -576,15 +612,18 @@ $(document).ready(function() {
     $(this).css("color", "#000000");
   });
 
+  // sort options
   $(document).on("click", ".sortoption", function() {
     var option = $(this).data('option');
     // hide results
     $('.result').each(function () {
       $(this).remove();
     });
+    // copy places list
     var sorted = places.slice();
     switch (option) {
       case "name":
+        // sort by name
         for (var i = 0; i < sorted.length -1 ; i++)
           for (var j = i+1; j < sorted.length; j++)
             if (sorted[i].name > sorted[j].name) {
@@ -594,9 +633,11 @@ $(document).ready(function() {
             }
         break;
       case "rating":
+        // sort by rating
         sorted = sortByRating(sorted);
         break;
       case "proximity":
+        // sort by proximity using place's distance value
         for (var i = 0; i < sorted.length -1 ; i++)
           for (var j = i+1; j < sorted.length; j++)
             if (sorted[i].distance > sorted[j].distance) {
@@ -608,18 +649,22 @@ $(document).ready(function() {
       default:
         break;
     }
+    // show shorted results
     showResults(sorted);
+    // hide sort bar
     $('#sortbar').css("display", "none");
     $('#sortbox > img').attr("src", "images/expand.png");
     sortbar = false;
   });
 
+  // toggle sidebar
   $('#sidebaricon').click(function() {
     if (sidebar) $('#sidebar').css("display", "none");
     else $('#sidebar').css("display", "table");
     sidebar = !sidebar;
   });
 
+  // toggle sidebar filter menu
   $('#filtertoggle').click(function() {
     if (filtertoggle) $('#filtertoggle > img').attr("src", "images/expand.png");
     else $('#filtertoggle > img').attr("src", "images/shrink.png");
@@ -627,6 +672,7 @@ $(document).ready(function() {
     $('#filters').toggle();
   });
 
+  // toggle sidebar cuisine menu
   $('#cuisinetoggle').click(function() {
     if (cuisinetoggle) $('#cuisinetoggle > img').attr("src", "images/expand.png");
     else $('#cuisinetoggle > img').attr("src", "images/shrink.png");
@@ -634,6 +680,7 @@ $(document).ready(function() {
     $('#cats').toggle();
   });
 
+  // toggle sidebar recent searches menu
   $('#searchtoggle').click(function() {
     if (searchtoggle) $('#searchtoggle > img').attr("src", "images/expand.png");
     else $('#searchtoggle > img').attr("src", "images/shrink.png");
@@ -641,26 +688,31 @@ $(document).ready(function() {
     $('#searchhistory').toggle();
   });
 
+  // search for cuisine name clicked on
   $(document).on('click', '.filter-cuisine', function () {
     var query = $(this).data('cuisineitem');
     saveMapCenter();
     window.location.href = 'results.html?query=' + query;
   });
 
+  // Near You sidebar button
   $(document).on('click', '#nearyou', function () {
     window.location.href = 'results.html?filter=near';
   });
 
+  // Most Popular sidebar button
   $(document).on('click', '#popular', function () {
     saveMapCenter();
     window.location.href = 'results.html?filter=popular';
   });
+
+  // Top Rated sidebar button
   $(document).on('click', '#toprated', function () {
     saveMapCenter();
     window.location.href = 'results.html?filter=toprated';
   });
 
-
+  // sidebar search buttons
   $(document).on('click', '.filter-search', function () {
     var query = $(this).text();
     $('#search').val(query);
@@ -669,6 +721,7 @@ $(document).ready(function() {
     searchQuery(query);
   });
 
+  // change colour of marker for place result currently hovered on
   $(document).on({
     mouseenter: function () {
       var placeId = $(this).data('id');
@@ -682,7 +735,6 @@ $(document).ready(function() {
         if (m.getPlace().placeId == placeId) marker = m;
       });
       marker.setIcon(icon);
-
     },
     mouseleave: function () {
       var placeId = $(this).data('id');
@@ -699,17 +751,21 @@ $(document).ready(function() {
     }
   }, '.result');
 
+  // search
   $('#search').keydown( function(e) {
 	   var key = e.charCode ? e.charCode : e.keyCode ? e.keyCode : 0;
-	   if(key == 13) {
+	   if (key == 13) {
 		   var query = $(this).val();
-       console.log(history.indexOf(query));
 			if (history.indexOf(query) == -1) {
-        if (history.length == 5) history = history.slice(1);
+        // search history has size 5 or more, remove first element
+        if (history.length >= 5) history = history.slice(1);
+        // add latest search to search history
         history.push(query);
       }
+      // save search history in cookies
 			$.cookie('history', escape(history.join(',')), {expires:1234});
       saveMapCenter();
+      // search for query
 			window.location.href = 'results.html?query=' + query;
 	   }
    });
@@ -719,14 +775,17 @@ $(document).ready(function() {
       $(this).trigger("enterKey");
     }
   });
+
+  // append recent searches to sidebar
   $(window).load(function() {
     for (i = 0; i < history.length; i++) {
-	  if (history[i] !== "undefined" ){
-		  $('#searchhistory').append('<div class="filter filter-cuisine" data-cuisineitem="' + history[i] + '">' + history[i] + '</div>');
-	  }
+  	  if (history[i] !== "undefined" ) {
+  		  $('#searchhistory').append('<div class="filter filter-cuisine" data-cuisineitem="' + history[i] + '">' + history[i] + '</div>');
+  	  }
     }
   });
 
+  // toggle sort sidebar
   $('#sortbox').click(function() {
     if (sortbar) {
       $('#sortbar').css("display", "none");
@@ -739,12 +798,14 @@ $(document).ready(function() {
     sortbar = !sortbar;
   });
 
+  // change background colour of hovered icons in header
   $('.headericon').hover(function() {
     $(this).css("background-color", "#BE5E00");
   }, function() {
     $(this).css("background-color", "");
   });
 
+  // functions for header icons
   $('.headericon').click(function() {
     var val = $(this).attr('id');
     switch (val) {
@@ -757,6 +818,7 @@ $(document).ready(function() {
         $('#registercontainer').css('display', 'block');
         break;
       case 'profile':
+        // go to profile page
         window.location.href = 'profile.html';
         break;
       case 'logout':
@@ -771,6 +833,7 @@ $(document).ready(function() {
     }
   });
 
+  // hide log in or register forms
   $('.closebutton').click(function() {
     $(this).parent().parent().css('display', 'none');
   });
