@@ -334,3 +334,79 @@ hr {
 	margin-top: 0.35em;
 	margin-left: 0.5em;
 }
+
+#registercontainer, #logincontainer {
+	position: fixed;
+	display: none;
+	width:30em;
+	background-color:rgba(250,250,252,.9);
+	margin-left: 32%;
+	box-shadow:0 0 3px #999;
+}
+
+#container_body{
+	padding:0.5em;
+	}
+.form_title{
+	font-size:2em;
+	color:#EE7600;
+	text-align:center;
+	font-weight:normal;
+	}
+
+.input_name{
+	width:99%;
+	font-size:1em;
+	}
+#email_form{
+	clear:both;
+	padding:15px 0 10px 0px;
+	}
+.input_email{
+	width:99%;
+	font-size: 1em;
+	}
+#Re_email_form{
+	padding:5px 0 5px 0px;
+	}
+.input_Re_email{
+	width:99%;
+	font-size:1em;
+	}
+#password_form{
+	padding:10px 0 10px 0px;
+	}
+
+input {
+	border: 1px solid #EE7600;
+}
+
+.input_password{
+	width:99%;
+	font-size:1em;
+	}
+
+select{
+	border: 1px solid #EE7600;
+	padding:5px;
+	}
+
+.userbutton {
+	font-size:1em;
+	color: white;
+	text-align:center;
+	background-color: #EE7600;
+	padding:10px;
+	margin-top:10px;
+	cursor: pointer;
+	}
+#errorBox{
+	color:#F00;
+	}
+
+.closebutton {
+	float: right;
+	color: #EE7600;
+	cursor: pointer;
+	font-size: 1.2em;
+}

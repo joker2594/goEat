@@ -9,6 +9,7 @@ var places = [];
 var markers = [];
 var topRatedClicked = false;
 var locationGiven = false;
+var loggedin = 0;
 
 function getMapCenter() {
   var page = document.URL.split('goEat/')[1];
@@ -153,10 +154,24 @@ function addResult(place) {
   if (place.formatted_address) address = place.formatted_address.split(', United Kingdom')[0];
   var type = "";
   if (place.types) type = place.types[0];
-  if (type == 'meal_takeaway') type = 'Restaurant and takeaway';
-  if (type == 'night_club') type = 'Night club';
-  type = type.charAt(0).toUpperCase() + type.slice(1);
-  result += '<table><tr><td align="center"><i class="fa fa-cutlery"></i></td><td> ' + type;
+  result += '<table><tr><td align="center">'
+  switch (type) {
+    case 'meal_takeaway':
+      type = '<i class="fa fa-cutlery"></i></td><td> Restaurant and takeaway';
+      break;
+    case 'night_club':
+      type = '<i class="fa fa-glass"></i></td><td> Night Club';
+      break;
+    case 'bar':
+      type = '<i class="fa fa-glass"></i></td><td> Bar';
+      break;
+    case 'restaurant':
+      type = '<i class="fa fa-cutlery"></i></td><td> Restaurant';
+      break;
+    default:
+      type = '<i class="fa fa-cutlery"></i></td><td> ' + type.charAt(0).toUpperCase() + type.slice(1);
+  }
+  result += type;
   result += '</td></tr><tr><td align="center"><i class="fa fa-map-marker"></i></td><td> ' + address + '</td></tr>';
   result += '<tr><td align="center"><i class="fa fa-road"></i></td><td> ' + place.distance + ' km from ';
   if (locationGiven) result += 'your current location</td></tr></table>';
@@ -343,11 +358,25 @@ function createPlaceView(place) {
           var address = place.formatted_address.split(', United Kingdom')[0];
            result+='<div class="details"><table align="center"><tr><td align="center"><i class="fa fa-map-marker"></i></td><td> ' + address + '</td></tr>';
     //type
-          var type = place.types[0];
-          if (type == 'meal_takeaway') type = 'Restaurant and takeaway';
-          if (type == 'night_club') type = "Night club";
-          type = type.charAt(0).toUpperCase() + type.slice(1);
-          result += '<tr><td align="center"><i class="fa fa-cutlery"></i></td><td> ' + type;
+      result += '<tr><td align="center">'
+      var type = place.types[0];
+      switch (type) {
+        case 'meal_takeaway':
+          type = '<i class="fa fa-cutlery"></i></td><td> Restaurant and takeaway';
+          break;
+        case 'night_club':
+          type = '<i class="fa fa-glass"></i></td><td> Night Club';
+          break;
+        case 'bar':
+          type = '<i class="fa fa-glass"></i></td><td> Bar';
+          break;
+        case 'restaurant':
+          type = '<i class="fa fa-cutlery"></i></td><td> Restaurant';
+          break;
+        default:
+          type = '<i class="fa fa-cutlery"></i></td><td> ' + type.charAt(0).toUpperCase() + type.slice(1);
+      }
+      result += type;
     //telephone
     var tel=place.formatted_phone_number;
     result+= '</td></tr><tr><td align="center"><i class="fa fa-phone"></i></td><td> ' + tel ;
@@ -413,6 +442,11 @@ function showResults(places) {
   }
 }
 
+function submit() {
+  $.cookie('loggedin', escape(1), {expires:1234});
+  window.location.href = 'index.html';
+}
+
 $(document).ready(function() {
   var cookie=unescape($.cookie('history'));
   var history=cookie.split(',');
@@ -439,6 +473,12 @@ $(document).ready(function() {
     } else {
       ulocation = new google.maps.LatLng(55.863791, -4.251667);
       locationGiven = false;
+    }
+
+    loggedin = unescape($.cookie('loggedin'));
+    if (loggedin == 1) {
+      $('.loggedin').css('display', 'block');
+      $('.loggedout').css('display', 'none');
     }
 
     // check if at index
@@ -705,7 +745,33 @@ $(document).ready(function() {
     $(this).css("background-color", "");
   });
 
-  $('#location').click(function() {
-    setLocation();
+  $('.headericon').click(function() {
+    var val = $(this).attr('id');
+    switch (val) {
+      case 'login':
+        $('#logincontainer').css('display', 'block');
+        $('#registercontainer').css('display', 'none');
+        break;
+      case 'register':
+        $('#logincontainer').css('display', 'none');
+        $('#registercontainer').css('display', 'block');
+        break;
+      case 'profile':
+        window.location.href = 'profile.html';
+        break;
+      case 'logout':
+        $.cookie('loggedin', escape(0), {expires:1234});
+        window.location.href = 'index.html';
+        break;
+      case 'location':
+        setLocation();
+        break;
+      default:
+        break;
+    }
+  });
+
+  $('.closebutton').click(function() {
+    $(this).parent().parent().css('display', 'none');
   });
 });
