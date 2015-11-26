@@ -18,8 +18,11 @@
     <div id="wrapper">
       <div id="header">
         <div id="sidebaricon"></div>
-        <div title="Click to set your current location" id="location" class="headericon"></div>
-        <div id="usericon" class="headericon"></div>
+        <div id="location" title="Click to set your current location" class="headericon"><i class="fa fa-map-marker"></i> Set location</div>
+        <div id="logout" class="headericon loggedin"><i class="fa fa-times"></i> Log Out</div>
+        <div id="profile" class="headericon loggedin"><i class="fa fa-user"></i> Profile</div>
+        <div id="register" class="headericon loggedout"><i class="fa fa-user-plus"></i> Register</div>
+        <div id="login" class="headericon loggedout"><i class="fa fa-sign-in"></i> Login</div>
         <div onclick="location.href='index.html'" id="logo">goEat</div>
         <div id="searchbox"><input id="search" type="text" placeholder="Search for dishes or restaurants..." /></div>
       </div>

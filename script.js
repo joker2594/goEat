@@ -13,10 +13,13 @@ var locationGiven = false;
 function getMapCenter() {
   var page = document.URL.split('goEat/')[1];
   clocation = new google.maps.LatLng(55.863791, -4.251667);
+  if (page == 'index.html') {
+    $.cookie('clat', escape("55.863791"), {expires:1234});
+    $.cookie('clng', escape("-4.251667"), {expires:1234});
+  }
   var lat = unescape($.cookie('clat'));
   var lng = unescape($.cookie('clng'));
   if (lat != 'undefined') clocation = new google.maps.LatLng(parseFloat(lat), parseFloat(lng));
-  if (page == 'index.html') clocation = new google.maps.LatLng(55.863791, -4.251667);
   return clocation;
 }
 
@@ -85,6 +88,12 @@ function callbacknear(results, status) {
       addMarker(place);
     }
   }
+}
+
+function saveMapCenter() {
+  var center = map.getCenter();
+  $.cookie('clat', escape(center.lat()), {expires:1234});
+  $.cookie('clng', escape(center.lng()), {expires:1234});
 }
 
 function store(place) {
@@ -236,7 +245,7 @@ function addHomeMarker(infoWindow, pos) {
 function nearYou() {
   map = new google.maps.Map(document.getElementById('map'), {
     center: clocation,
-    zoom: 16,
+    zoom: 14,
   });
   infoWindow = new google.maps.InfoWindow({map: map});
 
@@ -296,7 +305,7 @@ function callbackid(place, status) {
   if (status == google.maps.places.PlacesServiceStatus.OK) {
     map = new google.maps.Map(document.getElementById('map'), {
       center: place.geometry.location,
-      zoom: 16
+      zoom: 14
     });
 
     var infoWindow = new google.maps.InfoWindow({
@@ -594,9 +603,7 @@ $(document).ready(function() {
 
   $(document).on('click', '.filter-cuisine', function () {
     var query = $(this).data('cuisineitem');
-    var center = map.getCenter();
-    $.cookie('clat', escape(center.lat()), {expires:1234});
-    $.cookie('clng', escape(center.lng()), {expires:1234});
+    saveMapCenter();
     window.location.href = 'results.html?query=' + query;
   });
 
@@ -605,9 +612,11 @@ $(document).ready(function() {
   });
 
   $(document).on('click', '#popular', function () {
+    saveMapCenter();
     window.location.href = 'results.html?filter=popular';
   });
   $(document).on('click', '#toprated', function () {
+    saveMapCenter();
     window.location.href = 'results.html?filter=toprated';
   });
 
@@ -615,9 +624,7 @@ $(document).ready(function() {
   $(document).on('click', '.filter-search', function () {
     var query = $(this).text();
     $('#search').val(query);
-    var center = map.getCenter();
-    $.cookie('clat', escape(center.lat()), {expires:1234});
-    $.cookie('clng', escape(center.lng()), {expires:1234});
+    saveMapCenter();
     initMap();
     searchQuery(query);
   });
@@ -662,9 +669,7 @@ $(document).ready(function() {
         history.push(query);
       }
 			$.cookie('history', escape(history.join(',')), {expires:1234});
-      var center = map.getCenter();
-      $.cookie('clat', escape(center.lat()), {expires:1234});
-      $.cookie('clng', escape(center.lng()), {expires:1234});
+      saveMapCenter();
 			window.location.href = 'results.html?query=' + query;
 	   }
    });

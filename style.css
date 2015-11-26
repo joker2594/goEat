@@ -20,13 +20,26 @@ body {
   z-index: 2;
 }
 
-#location {
+.headericon {
 	float: right;
-	height: 3em;
-	width: 3em;
-	background-image: url('images/location.png');
-	background-size: cover;
+  padding: 0.86em;
+  font-size: 1em;
+  display: table-cell;
+  vertical-align: middle;
 	cursor: pointer;
+	color: #fdf1e5;
+}
+
+.loggedin {
+	display: none;
+}
+
+.loggedout {
+	display: block;
+}
+
+#location {
+	width: 6.1em;
 }
 
 #usericon {
@@ -70,7 +83,7 @@ body {
   border: 1px solid #F8EEE5;
   padding: 3px;
   padding-left: 2em;
-  margin-left: 38%;
+  margin-left: 45%;
   background-image: url('images/search.png');
 }
 
