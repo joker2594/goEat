@@ -145,7 +145,7 @@ function addMarker(place) {
     if (result.formatted_address) address = result.formatted_address.split(', United Kingdom')[0];
     if (result.website) website = "| <a class='markerlink' href='" + result.website + "'>Visit website</a><br/>"
     infoWindow.setContent(
-      "<a href='place.html&id=" + result.place_id + "' style='color:#008080;text-decoration:none;font-size:1.5em;font-weight:bold;'>" + result.name +
+      "<a href='place.html?id=" + result.place_id + "' style='color:#008080;text-decoration:none;font-size:1.5em;font-weight:bold;'>" + result.name +
       "</a><br/><a class='markerlink' href='place.html?id=" + result.place_id + "'>Visit page</a> " +
       website + address
     );
