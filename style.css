@@ -20,10 +20,25 @@ body {
   z-index: 2;
 }
 
+#introduction {
+	text-align: center;
+	margin: auto;
+	margin-top: 5em;
+	width: 20em;
+	height: auto;
+	position: relative;
+	z-index: 2;
+	color: white;
+	padding: 1em;
+	padding-top: 0.5em;
+	background-color:rgba(238,118,0,.9);
+	box-shadow:0 0 3px #999;
+}
+
 .headericon {
 	float: right;
-  padding: 0.86em;
-  font-size: 1em;
+  padding: 14px;
+  font-size: 16px;
   display: table-cell;
   vertical-align: middle;
 	cursor: pointer;

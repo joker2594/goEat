@@ -201,6 +201,9 @@ function getType(type) {
     case 'restaurant':
       type = '<i class="fa fa-cutlery"></i></td><td> Restaurant';
       break;
+    case 'cafe':
+      type = '<i class="fa fa-coffee"></i></td><td> Cafe';
+      break;
     default:
       type = '<i class="fa fa-cutlery"></i></td><td> ' + type.charAt(0).toUpperCase() + type.slice(1);
   }
@@ -502,6 +505,7 @@ $(document).ready(function() {
 
     // check if user is logged in from cookies (1 for logged in, 0 otherwise)
     loggedin = unescape($.cookie('loggedin'));
+    console.log(loggedin);
     // if logged in, hide log in and registered icons and show profile and logout icons
     if (loggedin == 1) {
       $('.loggedin').css('display', 'block');
