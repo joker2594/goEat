@@ -125,7 +125,7 @@ function addMarker(place) {
     position: place.geometry.location,
     icon: {
       url: 'images/marker.png',
-      anchor: new google.maps.Point(10, 10),
+      anchor: new google.maps.Point(8, 25),
       scaledSize: new google.maps.Size(15, 25)
     },
     place: {
@@ -144,10 +144,12 @@ function addMarker(place) {
     var address = "";
     if (result.formatted_address) address = result.formatted_address.split(', United Kingdom')[0];
     if (result.website) website = "| <a class='markerlink' href='" + result.website + "'>Visit website</a><br/>"
+    var content = "";
+    if (result.photos) content = "<div style='display:table-cell'><img style='margin: auto;display:block' src=" + result.photos[0].getUrl({"maxWidth": 200, "maxHeight": 100}); + "/></div>";
     infoWindow.setContent(
-      "<a href='place.html?id=" + result.place_id + "' style='color:#008080;text-decoration:none;font-size:1.5em;font-weight:bold;'>" + result.name +
-      "</a><br/><a class='markerlink' href='place.html?id=" + result.place_id + "'>Visit page</a> " +
-      website + address
+      content +
+      "<div style ='display:table-cell'><a href='place.html?id=" + result.place_id + "' style='color:#008080;text-decoration:none;font-size:1.5em;font-weight:bold;'>" + result.name +
+      "</a><br/><a class='markerlink' href='place.html?id=" + result.place_id + "'>Visit page</a> " + website + address + "</div>"
     );
     infoWindow.open(map, marker);
     });
@@ -281,7 +283,7 @@ function addHomeMarker(infoWindow, pos) {
     position: pos,
     icon: {
       url: 'images/home.png',
-      anchor: new google.maps.Point(10, 10),
+      anchor: new google.maps.Point(8, 25),
       scaledSize: new google.maps.Size(15, 25)
     }
   });
@@ -318,7 +320,7 @@ function nearYou() {
         position: pos,
         icon: {
           url: 'images/home.png',
-          anchor: new google.maps.Point(10, 10),
+          anchor: new google.maps.Point(8, 25),
           scaledSize: new google.maps.Size(15, 25)
         }
       });
@@ -360,7 +362,7 @@ function callbackid(place, status) {
     });
 
     var infoWindow = new google.maps.InfoWindow({
-      content:"<a style='color:#008080;text-decoration:none;font-size:2em;font-weight:bold;'>" + place.name + "</a>"
+      content:"<a style='color:#EE7600;text-decoration:none;font-size:2em;font-weight:bold;'>" + place.name + "</a>"
     });
 
     // add marker at current place
@@ -368,16 +370,17 @@ function callbackid(place, status) {
       map: map,
       position: place.geometry.location,
       icon: {
-        url: 'images/marker.png',
-        anchor: new google.maps.Point(10, 10),
-        scaledSize: new google.maps.Size(15, 25)
+        url: 'images/selected.png',
+        anchor: new google.maps.Point(10, 32),
       }
     });
+    marker.setZIndex(google.maps.Marker.MAX_ZINDEX + 1);
     marker.addListener('click', function() {
       infoWindow.open(map, marker);
     });
     // add place details in page
     createPlaceView(place);
+    searchQuery('restaurant');
   }
 }
 
@@ -421,7 +424,12 @@ function createPlaceView(place) {
   }else if (priceLevel==4){
     formattedPriceLevel= 'Very Expensive';
   }else formattedPriceLevel= 'No details about pricing';
-  result+= '<tr><td><i class="fa fa-gbp"></i></td><td> ' + formattedPriceLevel +'</td></tr></table></div>' ;
+  result+= '<tr><td><i class="fa fa-gbp"></i></td><td> ' + formattedPriceLevel +'</td></tr>'
+  var distance = place.distance = (google.maps.geometry.spherical.computeDistanceBetween(ulocation, place.geometry.location) / 1000).toFixed(2);
+  result += '<tr><td align="center"><i class="fa fa-road"></i></td><td> ' + distance + ' km from ';
+  if (locationGiven) result += 'your current location';
+  else result += 'City Centre';
+  result+=  '</td></tr></table></div>';
 	// opening hours
   var hours = "";
 	openNow = null;
@@ -505,7 +513,6 @@ $(document).ready(function() {
 
     // check if user is logged in from cookies (1 for logged in, 0 otherwise)
     loggedin = unescape($.cookie('loggedin'));
-    console.log(loggedin);
     // if logged in, hide log in and registered icons and show profile and logout icons
     if (loggedin == 1) {
       $('.loggedin').css('display', 'block');
@@ -732,7 +739,7 @@ $(document).ready(function() {
       var marker;
       var icon = {
         url: 'images/selected.png',
-        anchor: new google.maps.Point(10, 10),
+        anchor: new google.maps.Point(8, 25),
         scaledSize: new google.maps.Size(15, 25)
       };
       markers.forEach(function (m) {
