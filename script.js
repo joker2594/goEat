@@ -10,9 +10,10 @@ var homemarker;
 
 var places = [];
 var markers = [];
-var topRatedClicked = false;
+var openClicked = false;
 var locationGiven = false;
 var loggedin = 0;
+var counter = 0;
 
 function getMapCenter() {
   // if at index, reset center of map to Glasgow city centre
@@ -62,12 +63,8 @@ function sortByRating(list) {
 }
 
 // callback function used by Google Places search
-function callback(results, status) {
+function callback(results, status, pagination) {
   if (status == google.maps.places.PlacesServiceStatus.OK) {
-    if (topRatedClicked) {
-      results = sortByRating(results);
-      topRatedClicked = false;
-    }
     for (var i = 0; i < results.length; i++) {
       var place = results[i];
       store(place);
@@ -81,6 +78,7 @@ function callback(results, status) {
       var marker = addMarker(place);
       markers.push(marker);
     }
+    if (pagination.hasNextPage) pagination.nextPage();
   }
 }
 
@@ -98,7 +96,8 @@ function callbacknear(results, status) {
         store(result);
         addResult(result);
       });
-      addMarker(place);
+      var marker = addMarker(place);
+      markers.push(marker);
     }
   }
 }
@@ -183,8 +182,9 @@ function addResult(place) {
   result += '</td></tr><tr><td align="center"><i class="fa fa-map-marker"></i></td><td> ' + address + '</td></tr>';
   // distance
   result += '<tr><td align="center"><i class="fa fa-road"></i></td><td> ' + place.distance + ' km from ';
-  if (locationGiven) result += 'your current location</td></tr></table>';
-  else result += 'City Centre<br/>';
+  if (locationGiven) result += 'your current location</td></tr>'
+  else result += 'City Centre</td></tr>';
+  result += '</table>';
   result += '</div></div>';
   $('#results').append(result);
 }
@@ -235,7 +235,7 @@ function getIconRating(rating) {
 }
 
 // search for places with given query
-function searchQuery(query) {
+function searchQuery(query, open=false) {
   places = [];
   $('.result').each(function () {
     $(this).remove();
@@ -246,6 +246,7 @@ function searchQuery(query) {
     bounds: map.getBounds(),
     query: query,
     types: ['restaurant', 'meal_takeaway'],
+    openNow: open
   }
   service.textSearch(request, callback);
 }
@@ -325,7 +326,7 @@ function nearYou() {
         }
       });
       google.maps.event.addListener(homemarker, 'click', function() {
-        infoWindow.setContent("<span style='font-weight:bold;color:#EE7600;font-size:1.5em;'>You are here.</span>");
+        infoWindow.setContent("<span style='font-weight:bold;color:#a6a6a6;font-size:1.5em;'>You are here.</span>");
         infoWindow.open(map, homemarker);
       });
       $('#results-for').text("Near You");
@@ -553,10 +554,10 @@ $(document).ready(function() {
             searchQuery("restaurant");
             $('#results-for').text("Most Popular");
           }
-          if (filter == "toprated") {
-            topRatedClicked = true;
-            searchQuery("restaurant");
-            $('#results-for').text("Top Rated");
+          if (filter == "open") {
+            openClicked = true;
+            searchQuery("restaurant", openClicked);
+            $('#results-for').text("Open Now");
           }
         }
       }
@@ -717,10 +718,10 @@ $(document).ready(function() {
     window.location.href = 'results.html?filter=popular';
   });
 
-  // Top Rated sidebar button
-  $(document).on('click', '#toprated', function () {
+  // Open Now sidebar button
+  $(document).on('click', '#opennow', function () {
     saveMapCenter();
-    window.location.href = 'results.html?filter=toprated';
+    window.location.href = 'results.html?filter=open';
   });
 
   // sidebar search buttons
@@ -745,6 +746,7 @@ $(document).ready(function() {
       markers.forEach(function (m) {
         if (m.getPlace().placeId == placeId) marker = m;
       });
+      marker.setZIndex(google.maps.Marker.MAX_ZINDEX + 1);
       marker.setIcon(icon);
     },
     mouseleave: function () {
@@ -752,7 +754,7 @@ $(document).ready(function() {
       var marker;
       var icon = {
         url: 'images/marker.png',
-        anchor: new google.maps.Point(10, 10),
+        anchor: new google.maps.Point(8, 25),
         scaledSize: new google.maps.Size(15, 25)
       };
       markers.forEach(function (m) {
