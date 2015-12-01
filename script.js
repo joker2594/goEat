@@ -235,7 +235,7 @@ function getIconRating(rating) {
 }
 
 // search for places with given query
-function searchQuery(query, open=false) {
+function searchQuery(query, open) {
   places = [];
   $('.result').each(function () {
     $(this).remove();
@@ -381,7 +381,7 @@ function callbackid(place, status) {
     });
     // add place details in page
     createPlaceView(place);
-    searchQuery('restaurant');
+    searchQuery('restaurant', false);
   }
 }
 
@@ -547,11 +547,11 @@ $(document).ready(function() {
         if (filter == undefined) {
           // if no filter, do default query
           initMap();
-          searchQuery("restaurant");
+          searchQuery("restaurant", false);
         } else {
           if (filter == "near") nearYou();
           if (filter == "popular") {
-            searchQuery("restaurant");
+            searchQuery("restaurant", false);
             $('#results-for').text("Most Popular");
           }
           if (filter == "open") {
@@ -565,7 +565,7 @@ $(document).ready(function() {
       // normal query, search with it
       initMap();
       query = decodeURI(query);
-      searchQuery(query);
+      searchQuery(query, false);
     }
   });
 
@@ -730,7 +730,7 @@ $(document).ready(function() {
     $('#search').val(query);
     saveMapCenter();
     initMap();
-    searchQuery(query);
+    searchQuery(query, false);
   });
 
   // change colour of marker for place result currently hovered on

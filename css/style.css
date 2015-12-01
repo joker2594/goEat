@@ -26,7 +26,9 @@ body {
 	margin-top: 5em;
 	width: 20em;
 	height: auto;
-	position: relative;
+	margin-left: 37%;
+	margin-right: 37%;
+	position: fixed;
 	z-index: 2;
 	color: white;
 	padding: 1em;
